@@ -1,7 +1,6 @@
 require("dotenv").config();
 const knex = require("knex");
 
-// ตั้งค่าการเชื่อมต่อ PostgreSQL
 const db = knex({
   client: "pg",
   connection: {
