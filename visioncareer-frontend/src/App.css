@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Dongle&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  list-style: none;
+  box-sizing: border-box;
+  font-family: 'Roboto';
+  
+
+  
+  /* background-color: #fffffe !important; */
+}
+
+.backgroundcolor {
+    background: linear-gradient(90deg, #0357AF 0%, white 100%);
+    /* border-right:  1px solid #E5E7EB;  */
+  }
