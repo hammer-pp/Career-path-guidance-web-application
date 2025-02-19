@@ -20,7 +20,7 @@ const App = () => {
           <Link to="/" style={{ textDecoration: "none" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "3px", cursor: "pointer" }}>
               <img src={Logo} alt="Logo" style={{ width: "55px", height: "50px" }} />
-              <div style={{ color: "black", fontSize: "32px", fontFamily: "Roboto", fontWeight: 900 }}>
+              <div style={{ color: "black", fontSize: "32px", fontFamily: "'Noto Sans Thai', sans-serif", fontWeight: 900,marginTop:"5px" }}>
                 VisionCareer
               </div>
             </div>
@@ -164,7 +164,7 @@ const styles = {
     borderRadius: '25px',
     border: 'none',
     fontSize: '20px',
-    fontFamily: 'Roboto',
+    fontFamily: "'Noto Sans Thai', sans-serif",
     fontWeight: '400',
   },
   registerButton: {
@@ -175,7 +175,7 @@ const styles = {
     borderRadius: '25px',
     border: 'none',
     fontSize: '20px',
-    fontFamily: 'Roboto',
+    fontFamily: "'Noto Sans Thai', sans-serif",
     fontWeight: '400',
   }
 };

@@ -16,7 +16,7 @@ const HomePage = () => {
             marginTop: "50px",
             color: "black", 
             fontSize: "24px", 
-            fontFamily: "Roboto", 
+            fontFamily: "'Noto Sans Thai', sans-serif", 
             fontWeight: 400, 
             wordWrap: "break-word",
           }}>
@@ -40,7 +40,7 @@ const HomePage = () => {
                 borderRadius: '30px',
                 border: 'none', 
                 fontSize: '20px',
-                fontFamily: 'Roboto',
+                fontFamily: "'Noto Sans Thai', sans-serif",
                 fontWeight: '400',
                 display: 'flex',
                 alignItems: 'center',
@@ -85,7 +85,7 @@ const styles = {
   text: {
     color: "black",
     fontSize: "52px",
-    fontFamily: "Roboto",
+    fontFamily: "'Noto Sans Thai', sans-serif",
     fontWeight: 700,
     textTransform: "uppercase",
     wordWrap: "break-word",
