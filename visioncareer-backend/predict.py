@@ -44,38 +44,38 @@ def home():
 def predict():
     try:
         data = request.json.get("answers", [])
-        print(f"📌 จำนวนอินพุตที่ได้รับ: {len(data)}")
 
-        # ตรวจสอบจำนวนฟีเจอร์ที่ถูกต้อง
+        # ✅ ตรวจสอบว่าอินพุตมี 81 ค่า
         expected_features = len(holland_features) + len(big5_features)
         if len(data) != expected_features:
             return jsonify({
                 "error": f"Feature shape mismatch, expected: {expected_features}, got {len(data)}"
             }), 400
 
-        # แยกอินพุตให้แต่ละโมเดล
-        holland_data = data[:len(holland_features)]
-        big5_data = data[len(holland_features):]
+        # ✅ แยกอินพุตให้แต่ละโมเดล
+        holland_data = data[:len(holland_features)]  # 48 ค่า
+        big5_data = data[len(holland_features):]  # 33 ค่า
 
-        # แปลงเป็น DataFrame
+        # ✅ แปลงเป็น DataFrame
         holland_df = pd.DataFrame([holland_data], columns=holland_features)
         big5_df = pd.DataFrame([big5_data], columns=big5_features)
 
-        # พยากรณ์ผลลัพธ์
-        holland_pred = models["holland"].predict(xgb.DMatrix(holland_df)).flatten().tolist()
-        big5_pred = models["big5"].predict(xgb.DMatrix(big5_df)).flatten().tolist()
+        # ✅ พยากรณ์ผลลัพธ์ (ใช้ argmax() แปลงค่า Probability → กลุ่ม)
+        holland_pred = int(np.argmax(models["holland"].predict(xgb.DMatrix(holland_df))))
+        big5_pred = int(np.argmax(models["big5"].predict(xgb.DMatrix(big5_df))))
+
+        print(f"📌 กลุ่ม Holland: {holland_pred}, กลุ่ม Big5: {big5_pred}")
 
         predictions = {
-            "holland": holland_pred,  # ✅ คืนค่าเป็น list ธรรมดา
-            "big5": big5_pred         # ✅ คืนค่าเป็น list ธรรมดา
+            "holland_group": holland_pred + 1,  # ให้เริ่มจาก 1 แทน 0
+            "big5_group": big5_pred + 1  # ให้เริ่มจาก 1 แทน 0
         }
 
         return jsonify(predictions)
 
     except Exception as e:
-        return jsonify({"error": str(e)})
+        return jsonify({"error": str(e)}), 500
 
-# 📌 แก้ปัญหา Flask โหลด API ไม่ถูกต้อง
 if __name__ == "__main__":
     print("🚀 กำลังรัน Flask API บนพอร์ต 5001...")
     app.run(debug=True, port=5001)
