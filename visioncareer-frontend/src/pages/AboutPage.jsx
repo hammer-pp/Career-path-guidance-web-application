@@ -1,4 +1,4 @@
-// src/pages/TestPage.jsx
+// src/pages/AboutPage.jsx
 import React from 'react';
 
 const styles = {

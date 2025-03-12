@@ -613,7 +613,7 @@ const styles = {
   button: {
     background: 'linear-gradient(90deg, #E4815A 0%, #F9D423 100%)',
     color: 'white',
-    width: '250px',
+    width: '300px',
     height: '90px',
     borderRadius: '30px',
     border: 'none',

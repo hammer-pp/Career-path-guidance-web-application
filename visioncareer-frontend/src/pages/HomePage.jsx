@@ -1,8 +1,15 @@
 import React from "react";
+import { useNavigate } from "react-router-dom"; // เพิ่ม useNavigate
 import LogoHomepage from '../assets/LogoHomepage.png';
 import { Button } from 'antd';
 
 const HomePage = () => {
+  const navigate = useNavigate(); // ใช้ useNavigate
+
+  const handleClick = () => {
+    navigate("/test"); // เปลี่ยนเส้นทางไปหน้า /test
+  };
+
   return (
     <main style={styles.content}>
       <div style={styles.contentContainer}>
@@ -50,6 +57,7 @@ const HomePage = () => {
               }}
               onMouseDown={(e) => e.target.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)'}  // เมื่อกดปุ่มเงาจะเปลี่ยน
               onMouseUp={(e) => e.target.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.2)'}  // เมื่อปล่อยปุ่มเงาจะกลับมา
+              onClick={handleClick} // เพิ่ม onClick เพื่อเรียกใช้ handleClick
             >
               <span>เริ่มต้นการใช้งาน</span>
             </Button>
