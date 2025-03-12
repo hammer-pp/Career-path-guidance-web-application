@@ -2,9 +2,11 @@ import os
 import pandas as pd
 import numpy as np
 import xgboost as xgb
+import requests  
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
+BACKEND_URL = "http://localhost:5000"
 
 # 📌 กำหนด path ให้แน่นอน
 ML_DIR = os.path.join(os.path.dirname(__file__), "../ML")
@@ -44,6 +46,7 @@ def home():
 def predict():
     try:
         data = request.json.get("answers", [])
+        user_id = request.json.get("user_id")  # ✅ รับ user_id จาก frontend
 
         # ✅ ตรวจสอบว่าอินพุตมี 81 ค่า
         expected_features = len(holland_features) + len(big5_features)
@@ -70,6 +73,19 @@ def predict():
             "holland_group": holland_pred + 1,  # ให้เริ่มจาก 1 แทน 0
             "big5_group": big5_pred + 1  # ให้เริ่มจาก 1 แทน 0
         }
+
+        # ✅ ส่งผลลัพธ์ไปบันทึกใน Backend
+        try:
+            response = requests.post(f"{BACKEND_URL}/results", json={
+                "user_id": user_id,
+                "holland_group": predictions["holland_group"],
+                "big5_group": predictions["big5_group"]
+            })
+
+            if response.status_code != 200:
+                print("❌ Failed to save prediction result:", response.json())
+        except Exception as err:
+            print("❌ ไม่สามารถบันทึกผลลัพธ์ไปที่ Backend:", err)
 
         return jsonify(predictions)
 

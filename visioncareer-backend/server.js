@@ -122,6 +122,78 @@ app.post("/login", async (req, res) => {
   }
 });
 
+app.post("/results", async (req, res) => {
+  try {
+    const { user_id, holland_group, big5_group } = req.body;
+
+    // ตรวจสอบว่าผู้ใช้มีผลการทดสอบแล้วหรือไม่
+    const existingResult = await db("results").where("user_id", user_id).first();
+
+    if (existingResult) {
+      // อัปเดตผลลัพธ์เดิม
+      await db("results")
+        .where("user_id", user_id)
+        .update({ holland_group, big5_group });
+
+      return res.json({ message: "Updated existing test result successfully." });
+    } else {
+      // บันทึกผลลัพธ์ใหม่
+      await db("results").insert({ user_id, holland_group, big5_group });
+
+      return res.json({ message: "Test result saved successfully." });
+    }
+  } catch (error) {
+    console.error("Error saving test result:", error);
+    res.status(500).json({ error: "Failed to save test result" });
+  }
+});
+
+app.get("/results/:user_id", async (req, res) => {
+  try {
+    const { user_id } = req.params;
+    const result = await db("results").where("user_id", user_id).first();
+
+    if (!result) {
+      return res.status(404).json({ error: "No test result found for this user." });
+    }
+
+    res.json(result);
+  } catch (error) {
+    console.error("Error retrieving test result:", error);
+    res.status(500).json({ error: "Failed to retrieve test result" });
+  }
+});
+
+app.get("/recommendations/:user_id", async (req, res) => {
+  try {
+    const { user_id } = req.params;
+
+    // ✅ ดึงรายการคณะที่แนะนำให้ผู้ใช้
+    const recommendations = await db("Recommendations as r")
+      .join("University_Faculty as uf", "r.UniversityFacultyID", "=", "uf.UniversityFacultyID")
+      .join("Universities as u", "uf.UniversityID", "=", "u.UniversityID")
+      .join("Careers as c", "uf.FacultyID", "=", "c.FacultyID")
+      .where("r.UserID", user_id)
+      .select(
+        "r.RecommendationID",
+        "u.UniversityName",
+        "uf.FacultyName",
+        "c.CareerName",
+        "r.CreatedAt"
+      );
+
+    if (recommendations.length === 0) {
+      return res.status(404).json({ message: "No recommendations found for this user." });
+    }
+
+    res.json({ user_id, recommendations });
+
+  } catch (error) {
+    console.error("Error fetching recommendations:", error);
+    res.status(500).json({ error: "Failed to fetch recommendations." });
+  }
+});
+
 // ตั้งค่าพอร์ต
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
