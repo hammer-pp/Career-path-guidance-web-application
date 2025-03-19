@@ -1,0 +1,78 @@
+/* src/styles/HomePage.module.css */
+.contenthome {
+  flex: 1;
+  padding: 2rem;
+}
+
+.contentContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.textContainer {
+  flex: 1;
+  padding-left: 100px;
+}
+
+.text {
+  color: black;
+  font-size: 52px;
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  word-wrap: break-word;
+  line-height: 1.2;
+}
+
+.imageContainer {
+  flex: 1;
+  display: flex;
+  margin-left: 300px;
+  margin-top: 80px;
+}
+
+.logoHomepage {
+  width: 543px;
+  height: 645px;
+}
+
+.buttonStyle {
+  background: linear-gradient(90deg, #E4815A 0%, #F9D423 100%);
+  color: white;
+  width: 250px;
+  height: 90px;
+  border-radius: 30px;
+  border: none;
+  font-size: 20px;
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 16px rgba(0, 0, 0, 0.2);
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.buttonStyle:active {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.subText {
+  width: 672px;
+  margin-top: 50px;
+  color: black;
+  font-size: 24px;
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-weight: 400;
+  word-wrap: break-word;
+}
+
+.buttonWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 75px;
+  margin-left: -220px;
+}
