@@ -1,33 +1,12 @@
-// src/pages/TestPage.jsx
 import React, { useState } from 'react';
 import { Button, Steps } from 'antd';
-import '../App.css';
+// import '../styles/TestPage.css'; // นำเข้าไฟล์ CSS
+import styles from '../styles/TestPage.module.css'; // นำเข้าไฟล์ CSS Modules
 
 const { Step } = Steps;
 
-const stepTitleStyle = {
-  color: "black",
-  fontSize: "24px",
-  fontFamily: "'Noto Sans Thai', sans-serif",
-  fontWeight: 400,
-  wordWrap: "break-word",
-};
 
-const stepDescriptionStyle = {
-  color: "black",
-  fontSize: "12px",
-  fontFamily: "'Noto Sans Thai', sans-serif",
-  fontWeight: 400,
-  wordWrap: "break-word",
-};
 
-const stepDescriptionStyle2 = {
-  color: "black",
-  fontSize: "17px",
-  fontFamily: "'Noto Sans Thai', sans-serif",
-  fontWeight: 100,
-  wordWrap: "break-word",
-};
 // สร้างข้อมูลคำถาม (ความชอบ 48 ข้อ)
 const interestQuestions = [
   { question: "คุณชอบทดสอบคุณภาพชิ้นส่วนอุปกรณ์", options: ["ไม่ชอบอย่างมาก", "ไม่ชอบ", "เฉยๆ", "ชอบ", "ชอบอย่างมาก"] },
@@ -235,9 +214,7 @@ const interestQuestions = [
     
     question: "คุณชอบจัดเก็บบันทึกข้อมูลการจัดส่งและรับสินค้า",
     options: ["ไม่ชอบอย่างมาก", "ไม่ชอบ", "เฉยๆ", "ชอบ", "ชอบอย่างมาก"] ,
-  }
-
-  // ... เพิ่มอีกจนถึงข้อ 48
+  }// ... (คำถามทั้งหมด)
 ];
 
 // คำถามชุดที่ 2 (บุคลิกภาพ) - 33 ข้อ
@@ -276,36 +253,25 @@ const personalityQuestions = [
   { question: "คุณเข้าใจสิ่งต่าง ๆ ได้อย่างรวดเร็ว", options: ["ไม่เห็นด้วยอย่างมาก", "ไม่เห็นด้วย", "เฉยๆ", "เห็นด้วย", "เห็นด้วยอย่างมาก"] },
   { question: "คุณเต็มไปด้วยไอเดียใหม่ ๆ", options: ["ไม่เห็นด้วยอย่างมาก", "ไม่เห็นด้วย", "เฉยๆ", "เห็นด้วย", "เห็นด้วยอย่างมาก"] },
 
-
-  // ... เพิ่มอีกจนถึงข้อ 50
+  // ... (คำถามทั้งหมด)
 ];
 
-
 const TestPage = () => {
-  const [step, setStep] = useState(0); // ควบคุม Step
+  const [step, setStep] = useState(0);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [personalityAnswers, setPersonalityAnswers] = useState({}); // เก็บคำตอบชุดที่ 1
-  const [interestAnswers, setInterestAnswers] = useState({}); // เก็บคำตอบชุดที่ 2
+  const [personalityAnswers, setPersonalityAnswers] = useState({});
+  const [interestAnswers, setInterestAnswers] = useState({});
 
-  // เริ่มต้นแบบทดสอบ
-  const startTest = () => {
-    setStep(0.5); // ไปที่ "เอกลักษณ์บุคลิกภาพของคุณ"
-  };
-
-  const startTestper = () => {
-    setStep(1); // ไปที่ "เอกลักษณ์บุคลิกภาพของคุณ"
-  };
-
-  // เริ่มต้นแบบทดสอบชุดที่ 2 (ค้นหาความชอบ)
+  // ฟังก์ชันต่าง ๆ ที่ใช้ใน component
+  const startTest = () => setStep(0.5);
+  const startTestper = () => setStep(1);
   const startInterestTest = () => {
-    setStep(2); // ไปที่ "คุณลักษณะที่น่าสนใจของคุณ"
-    setCurrentQuestionIndex(0); // รีเซ็ตค่า index
+    setStep(2);
+    setCurrentQuestionIndex(0);
   };
 
-  // รายการข้อที่ต้องแปลงเป็นค่าติดลบ (index เริ่มจาก 0)
-  const negativeScoreQuestions = [1, 3, 6, 8, 10, 13, 15, 21, 22, 23, 25]; // ข้อที่ 2, 4, 7, 9, 11, 14, 16, 22, 23, 24, 26
+  const negativeScoreQuestions = [1, 3, 6, 8, 10, 13, 15, 21, 22, 23, 25];
 
-  // แปลงข้อความเป็นคะแนน
   const getScoreFromOption = (option) => {
     return option === "ชอบอย่างมาก" || option === "เห็นด้วยอย่างมาก" ? 5 :
            option === "ชอบ" || option === "เห็นด้วย" ? 4 :
@@ -314,15 +280,11 @@ const TestPage = () => {
            option === "ไม่ชอบอย่างมาก" || option === "ไม่เห็นด้วยอย่างมาก" ? 1 : 0;
   };
 
-  // จัดการการเลือกคำตอบ
   const handleAnswer = (answer, questionIndex) => {
     let score = getScoreFromOption(answer);
-
-    // ถ้าข้อคำถามเป็นข้อที่ต้องติดลบ ให้เปลี่ยนค่าเป็นติดลบ
     if (step === 1 && negativeScoreQuestions.includes(questionIndex)) {
       score = -score;
     }
-
     if (step === 1) {
       setPersonalityAnswers((prev) => ({ ...prev, [questionIndex]: score }));
     } else if (step === 2) {
@@ -330,20 +292,16 @@ const TestPage = () => {
     }
   };
 
-  // ตรวจสอบว่าผู้ใช้ตอบคำถามครบทุกข้อในชุดนั้น ๆ
   const checkAllAnswers = (questions, answers) => {
     return questions.every((_, index) => answers[index] !== undefined);
   };
 
-  // เมื่อผู้ใช้ตอบคำถามครบทั้งชุด
   const handleCompleteTest = (questions, answers) => {
     if (checkAllAnswers(questions, answers)) {
       console.log("คำตอบทั้งหมด:", answers);
-      // คุณสามารถทำอะไรต่อได้ที่นี่ เช่น ส่งคำตอบไปยัง backend หรือแสดงผลลัพธ์
     }
   };
 
-  // ฟังก์ชันสำหรับการย้อนกลับ
   const handleBack = () => {
     if (currentQuestionIndex >= 3) {
       setCurrentQuestionIndex(currentQuestionIndex - 3);
@@ -351,19 +309,19 @@ const TestPage = () => {
   };
 
   return (
-    <main style={styles.content}>
-      <div style={styles.contentContainer}>
+    <main className={styles.content}>
+      <div className={styles.contentContainer}>
         {/* ด้านซ้าย */}
-        <div style={styles.textContainer}>
+        <div className={styles.textContainertest}>
           {/* Step 0: หน้าเริ่มต้น */}
           {step === 0 && (
             <>
-              <div style={styles.text}>ยินดีต้อนรับสู่ VisionCareer</div>
-              <div style={styles.descriptionText}>
+              <div className={styles.text}>ยินดีต้อนรับสู่ VisionCareer</div>
+              <div className={styles.descriptionText}>
                 ทำแบบทดสอบเพียงไม่ถึง 30 นาที ค้นพบเส้นทางอนาคตที่เหมาะกับคุณได้ทันที
               </div>
-              <div style={styles.buttonContainer2}>
-                <Button type="primary" style={styles.button} onClick={startTest}>
+              <div className={styles.buttonContainer2}>
+                <Button type="primary" className={styles.button} onClick={startTest}>
                   <span>เริ่มต้นการทดสอบบุคลิกภาพ</span>
                 </Button>
               </div>
@@ -372,13 +330,13 @@ const TestPage = () => {
           {/* Step 0.5: หน้าคั่นก่อนเริ่มทำแบบทดสอบบุคลิกภาพ */}
           {step === 0.5 && (
             <>
-              <div style={styles.descriptionText1}>ขั้นตอนแรก</div>
-              <div style={styles.text}>ค้นหาตัวตนที่แท้จริงของคุณ</div>
-              <div style={styles.descriptionText2}>
+              <div className={styles.descriptionText1}>ขั้นตอนแรก</div>
+              <div className={styles.text}>ค้นหาตัวตนที่แท้จริงของคุณ</div>
+              <div className={styles.descriptionText2}>
                 เราจะแสดงสถานการณ์แบบสุ่มเพื่อช่วยให้เราทราบตัวตนของคุณมากขึ้น
               </div>
-              <div style={styles.buttonContainer2}>
-                <Button type="primary" style={styles.button2} onClick={startTestper}>
+              <div className={styles.buttonContainer2}>
+                <Button type="primary" className={styles.button2} onClick={startTestper}>
                   <span>เริ่มต้นแบบทดสอบบุคลิกภาพ</span>
                 </Button>
               </div>
@@ -387,13 +345,13 @@ const TestPage = () => {
           {/* Step 1.5: หน้าอธิบายก่อนเริ่มเทสชุดที่ 2 */}
           {step === 1.5 && (
             <>
-              <div style={styles.descriptionText1}>ขั้นตอนถัดไป</div>
-              <div style={styles.text}>ค้นหาความชอบที่คุณสนใจ</div>
-              <div style={styles.descriptionText}>
+              <div className={styles.descriptionText1}>ขั้นตอนถัดไป</div>
+              <div className={styles.text}>ค้นหาความชอบที่คุณสนใจ</div>
+              <div className={styles.descriptionText}>
                 เราจะแสดงสถานการณ์แบบสุ่มเพื่อช่วยให้เราทราบตัวตนของคุณมากขึ้น
               </div>
-              <div style={styles.buttonContainer2}>
-                <Button type="primary" style={styles.button2} onClick={startInterestTest}>
+              <div className={styles.buttonContainer2}>
+                <Button type="primary" className={styles.button2} onClick={startInterestTest}>
                   <span>เริ่มต้นแบบทดสอบความสนใจ</span>
                 </Button>
               </div>
@@ -402,67 +360,54 @@ const TestPage = () => {
 
           {/* Step 1 & 2: หน้าคำถาม */}
           {(step === 1 || step === 2) && (
-            <div style={styles.questionContainer}>
-              <div style={styles.titletext}>
-                {/* คำถามที่ {currentQuestionIndex + 1} - {currentQuestionIndex + 3} */}
-                {/*  / {step === 1 ? personalityQuestions.length : interestQuestions.length} */}
-              </div>
+            <div className={styles.questionContainer}>
+              <div className={styles.titletext}></div>
               {[0, 1, 2].map((offset) => {
                 const questionIndex = currentQuestionIndex + offset;
                 const question = step === 1
                   ? personalityQuestions[questionIndex]
                   : interestQuestions[questionIndex];
 
-                if (!question) return null; // ถ้าไม่มีคำถามให้ข้าม
+                if (!question) return null;
 
                 return (
-                  <div key={questionIndex} style={styles.questionBlock}>
-                    <div style={styles.textquestion}>
-                      {question.question}
-                    </div>
-                    <div style={styles.optionsContainer}>
-                      <div style={styles.optionLabelLeft}>ไม่เห็นด้วย</div>
+                  <div key={questionIndex} className={styles.questionBlock}>
+                    <div className={styles.textquestion}>{question.question}</div>
+                    <div className={styles.optionsContainer}>
+                      <div className={styles.optionLabelLeft}>ไม่เห็นด้วย</div>
                       {question.options.map((option, index) => {
                         const score = getScoreFromOption(option);
                         const answers = step === 1 ? personalityAnswers : interestAnswers;
                         return (
                           <Button
-                            className="custom-button"
-                            key={index}
-                            style={{
-                              ...styles.optionButton,
-                              ...(index === 0 ? styles.optionButtonLarge : {}),
-                              ...(index === 1 ? styles.optionButtonMedium : {}),
-                              ...(index === 2 ? styles.optionButtonSmall : {}),
-                              ...(index === 3 ? styles.optionButtonMedium : {}),
-                              ...(index === 4 ? styles.optionButtonLarge : {}),
-                              border: `4.5px solid ${
-                                index < 2
-                                  ? "#E4815A" // ปุ่มซ้ายสองตัว (ส้ม)
-                                  : index === 2
-                                  ? "#CCCCCC" // ปุ่มตรงกลาง (เทา)
-                                  : "#0180CC" // ปุ่มขวาสองตัว (น้ำเงิน)
-                              }`,
-                              ...(Math.abs(answers[questionIndex]) === score
+                          key={index}
+                          className={`
+                            ${styles.optionButton} 
+                            ${index === 0 ? styles.optionButtonLarge : ''}
+                            ${index === 1 ? styles.optionButtonMedium : ''}
+                            ${index === 2 ? styles.optionButtonSmall : ''}
+                            ${index === 3 ? styles.optionButtonMedium : ''}
+                            ${index === 4 ? styles.optionButtonLarge : ''}
+                          `}
+                          style={{
+                            border: `4.5px solid ${index < 2 ? "#E4815A" : index === 2 ? "#CCCCCC" : "#0180CC"}`, 
+                            ...(Math.abs(answers[questionIndex]) === score
                               ? { backgroundColor: index < 2 ? "#E4815A" : index === 2 ? "#CCCCCC" : "#0180CC" }
                               : {}),
-                            }}
-                            onClick={() => handleAnswer(option, questionIndex)}
-                          >
-                            {/* {option} */}
-                          </Button>
+                          }}
+                          onClick={() => handleAnswer(option, questionIndex)}
+                        ></Button>
                         );
                       })}
-                      <div style={styles.optionLabelRight}>เห็นด้วย</div>
+                      <div className={styles.optionLabelRight}>เห็นด้วย</div>
                     </div>
                   </div>
                 );
               })}
-              {/* เพิ่มปุ่ม "ย้อนกลับ" และ "ถัดไป" */}
-              <div style={styles.buttonContainer}>
+              <div className={styles.buttonContainer}>
                 <Button
                   type="primary"
-                  style={styles.backButton}
+                  className={styles.backButton}
                   onClick={handleBack}
                   disabled={currentQuestionIndex === 0}
                 >
@@ -470,7 +415,7 @@ const TestPage = () => {
                 </Button>
                 <Button
                   type="primary"
-                  style={styles.nextButton}
+                  className={styles.nextButton}
                   onClick={() => {
                     if (step === 1) {
                       if (currentQuestionIndex + 3 < personalityQuestions.length) {
@@ -504,267 +449,43 @@ const TestPage = () => {
         </div>
 
         {/* ด้านขวาของหน้าจอ */}
-        <div style={{ ...styles.rightBox, padding: "55px", paddingLeft: "70px" }}>
-          <Steps
-            direction="vertical"
-            current={step >= 3 ? 4 : step} // ถ้าจบแบบทดสอบแล้วไป Step 4
-            items={[
-              { title: <div style={stepTitleStyle}>เริ่มต้นการใช้งาน</div>, description: <div style={stepDescriptionStyle}>~ 1นาที</div> },
-              { title: <div style={stepTitleStyle}>เอกลักษณ์บุคลิกภาพของคุณ</div>, description: <div style={stepDescriptionStyle}>~ 10 นาที</div> },
-              { title: <div style={stepTitleStyle}>คุณลักษณะที่น่าสนใจของคุณ</div>, description: <div style={stepDescriptionStyle}>~ 10 นาที</div> },
-              { title: <div style={stepTitleStyle}>รวมต้นแบบบุคลิกภาพของคุณ</div>, description: <div style={stepDescriptionStyle}>{'< 5 นาที'}</div> },
-              { title: <div style={stepTitleStyle}>ผลลัพธ์ของคุณ</div>, description: <div style={stepDescriptionStyle2}>~ 3 นาที<br/>รายงานบุคลิกภาพ</div> },
-            ]}
+        <div className={styles.rightBox} style={{ padding: "52px 55px 0px 70px" }}>
+        <Steps
+              direction="vertical"
+              current={step >= 3 ? 4 : step}
+              items={[
+                {
+                  title: <div className={styles.stepTitle}>เริ่มต้นการใช้งาน</div>,
+                  description: <div className={styles.stepDescription}>{'< 1 นาที'}</div>,
+                },
+                {
+                  title: <div className={styles.stepTitle}>เอกลักษณ์บุคลิกภาพของคุณ</div>,
+                  description: <div className={styles.stepDescription}>{'< 10 นาที'}</div>,
+                },
+                {
+                  title: <div className={styles.stepTitle}>คุณลักษณะที่น่าสนใจของคุณ</div>,
+                  description: <div className={styles.stepDescription}>{'< 10 นาที'}</div>,
+                },
+                {
+                  title: <div className={styles.stepTitle}>รวมต้นแบบบุคลิกภาพของคุณ</div>,
+                  description: <div className={styles.stepDescription}>{'< 5 นาที'}</div>,
+                },
+                {
+                  title: <div className={styles.stepTitle}>ผลลัพธ์ของคุณ</div>,
+                  description: (
+                    <div>
+                      <div className={styles.stepDescription}>{'< 3 นาที'}</div>
+                      <div className={styles.stepDescription2}>รายงานบุคลิกภาพ</div>
+                    </div>
+                  ),
+                },
+              ]}
             style={{ width: '100%' }}
           />
         </div>
       </div>
     </main>
   );
-};
-
-const styles = {
-  content: {
-    display: "flex",
-    height: "87.5vh", // ให้พื้นที่ของหน้าจอเต็มความสูง
-    margin: 0,
-  },
-  contentContainer: {
-    display: "flex",
-    width: "100%", // ใช้ความกว้างเต็มหน้าจอ
-    background: "linear-gradient(90deg, #0357AF 0%, white 100%)",
-  },
-  textContainer: {
-    flex: 2, // ให้พื้นที่ซ้ายกิน 2/3 ของหน้าจอ
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    paddingRight: '20px',
-    paddingLeft: "100px",
-  },
-  text: {
-    color: "black",
-    fontSize: "52px",
-    fontFamily: "'Noto Sans Thai', sans-serif",
-    fontWeight: 700,
-    textTransform: "uppercase",
-    wordWrap: "break-word",
-    lineHeight: "1.2",
-  },
-  titletext: {
-    color: "black",
-    fontSize: "24px",
-    fontFamily: "'Noto Sans Thai', sans-serif",
-    fontWeight: 400,
-    wordWrap: "break-word",
-  },
-  textquestion: {
-    color: "black",
-    fontSize: "35px",
-    fontFamily: "'Noto Sans Thai', sans-serif",
-    fontWeight: 400,
-    wordWrap: "break-word",
-    marginBottom:"25px",
-    marginLeft:"25px",
-  },
-  descriptionText: {
-    width: '672px',
-    marginTop: '35px',
-    color: 'black',
-    fontSize: '24px',
-    fontFamily: "'Noto Sans Thai', sans-serif",
-    fontWeight: 400,
-    wordWrap: 'break-word',
-  },
-  descriptionText1: {
-    width: '672px',
-    marginTop: '-50px',
-    color: 'black',
-    fontSize: '24px',
-    fontFamily: "'Noto Sans Thai', sans-serif",
-    fontWeight: 400,
-    wordWrap: 'break-word',
-  },
-  descriptionText2: {
-    width: 'auto',
-    marginTop: '25px',
-    color: 'black',
-    fontSize: '24px',
-    fontFamily: "'Noto Sans Thai', sans-serif",
-    fontWeight: 400,
-    wordWrap: 'break-word',
-  },
-  buttonContainer: {
-    display: 'flex',
-    flexDirection: 'row', // จัดเรียงปุ่มในแนวนอน
-    justifyContent: 'center', // จัดให้อยู่กลางแนวนอน
-    alignItems: 'center', // จัดให้อยู่กลางแนวตั้ง
-    gap: '10px', // ระยะห่างระหว่างปุ่ม
-    width: '100%', // ให้ความกว้างเต็มพื้นที่
-    marginTop: '20px', // ระยะห่างจากด้านบน
-  },
-  buttonContainer2: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-    marginTop: '50px',
-  },
-  button: {
-    background: 'linear-gradient(90deg, #E4815A 0%, #F9D423 100%)',
-    color: 'white',
-    width: '300px',
-    height: '90px',
-    borderRadius: '30px',
-    border: 'none',
-    fontSize: '20px',
-    fontFamily: "'Noto Sans Thai', sans-serif",
-    fontWeight: '400',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    boxShadow: '0 10px 16px rgba(0, 0, 0, 0.2)',
-    transition: 'box-shadow 0.3s ease-in-out',
-  },
-  button2: {
-    background: 'white',
-    color: 'black',
-    width: '500px',
-    height: '70px',
-    borderRadius: '10px',
-    border: 'none',
-    fontSize: '20px',
-    fontFamily: "'Noto Sans Thai', sans-serif",
-    fontWeight: '400',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    transition: 'box-shadow 0.3s ease-in-out',
-  },
-  rightBox: {
-    flex: 1, // ให้พื้นที่ขวากิน 1/3 ของหน้าจอ
-    backgroundColor: 'white',
-    boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
-    padding: '20px',
-  },
-  questionContainer: {
-    width: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-  },
-  questionBlock: {
-    marginBottom: '30px', // เพิ่มระยะห่างระหว่างคำถาม
-    padding: '10px', // ให้พื้นที่ภายใน
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    textAlign: 'center',
-    width: '100%',
-    marginLeft: '-80px',
-  },
-  
-  optionsContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center', // จัดให้อยู่ตรงกลาง
-    alignItems: 'center',
-    gap: '15px', // เพิ่มระยะห่างระหว่างปุ่ม
-    width: '100%',
-    marginTop: '15px', // เพิ่มระยะห่างจากคำถาม
-  },
-  
-  optionButton: {
-    width: '50px', // ปรับขนาดปุ่มให้เป็นวงกลม
-    height: '50px', // ปรับขนาดปุ่มให้เป็นวงกลม
-    borderRadius: '50%', // ทำให้ปุ่มเป็นวงกลม
-    // border: '1px solid #0180cc', // เพิ่มเส้นขอบ
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    transition: 'background-color 0.3s ease-in-out, color 0.3s ease-in-out', // เพิ่มการเปลี่ยนสีเมื่อเลือก
-  },
-  optionButtonLarge: {
-    width: '80px', // ปุ่มใหญ่
-    height: '80px', // ปุ่มใหญ่
-    marginTop: '-20px',
-    // border: '2.5px solid #E4815A', // เพิ่มเส้นขอบ
-  },
-  optionButtonMedium: {
-    width: '60px', // ปุ่มกลาง
-    height: '60px', // ปุ่มกลาง
-    marginTop: '-20px',
-    // border: '1px solid #0180cc', // เพิ่มเส้นขอบ
-  },
-  optionButtonSmall: {
-    // width: '40px', // ปุ่มเล็ก
-    // height: '40px', // ปุ่มเล็ก
-    marginTop: '-20px',
-    borderRadius: "50%", // ทำให้เป็นวงกลม
-    // border: "2px solid #0180cc", // เพิ่มเส้นขอบ
-    display: "flex", // ให้เนื้อหาตรงกลาง
-    alignItems: "center", // จัดให้อยู่กึ่งกลางแนวตั้ง
-    justifyContent: "center", // จัดให้อยู่กึ่งกลางแนวนอน
-    // border: '1px solid #0180cc', // เพิ่มเส้นขอบ
-  },
-  // optionButtonSelected: {
-  //   backgroundColor: '#0180CC', // สีเมื่อเลือก
-  //   color: 'black', // สีข้อความเมื่อเลือก
-  // },
-  // optionLabel: {
-  //   fontSize: '14px',
-  //   fontFamily: "'Noto Sans Thai', sans-serif",
-  //   fontWeight: '400',
-  //   color: 'black',
-  // },
-  optionLabelLeft: {
-    fontSize: '24px',
-    fontFamily: "'Noto Sans Thai', sans-serif",
-    fontWeight: '400',
-  
-    marginRight: '10px', // ระยะห่างระหว่างข้อความกับปุ่มทางซ้าย
-    color: '#E4815A',
-
-  },
-  optionLabelRight: {
-    fontSize: '24px',
-    fontFamily: "'Noto Sans Thai', sans-serif",
-    fontWeight: '400',
-   
-    marginLeft: '10px', // ระยะห่างระหว่างข้อความกับปุ่มทางขวา
-    color: '#0180CC',
-  },
-
-  nextButton: {
-    background: 'linear-gradient(90deg, #E4815A 0%, #F9D423 100%)',
-    color: 'white',
-    width: '180px',
-    height: '55px',
-    borderRadius: '15px',
-    border:'none',
-    fontSize: '20px',
-    display: 'flex',
-    alignItems: 'center',
-    // flexDirection: 'row',  // ให้ปุ่มเรียงในแนวนอน
-    justifyContent: 'center',
-    // marginTop: '20px',
-  },
-  
-  backButton: {
-    background: '#ffffff',
-    color: 'black',
-    width: '180px',
-    height: '55px',
-    borderRadius: '15px',
-    
-    fontSize: '20px',
-    display: 'flex',
-    // flexDirection: 'row',  // ให้ปุ่มเรียงในแนวนอน
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: '-140px',
-    border: "1px solid #ccc", // เพิ่มขอบให้ดูชัดเจน
-  },
 };
 
 export default TestPage;

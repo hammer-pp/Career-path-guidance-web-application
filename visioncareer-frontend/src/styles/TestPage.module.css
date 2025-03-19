@@ -1,0 +1,289 @@
+.content {
+  display: flex;
+  margin: 0;
+}
+
+.contentContainer {
+  display: flex;
+  width: 100%;
+}
+
+.textContainertest {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding-right: 20px;
+  padding-left: 100px;
+}
+
+.text {
+  color: black;
+  font-size: 52px;
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  word-wrap: break-word;
+  line-height: 1.2;
+}
+
+.titletext {
+  color: black;
+  font-size: 24px;
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-weight: 400;
+  word-wrap: break-word;
+}
+
+.textquestion {
+  color: black;
+  font-size: 35px;
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-weight: 400;
+  word-wrap: break-word;
+  margin-bottom: 25px;
+  margin-left: 25px;
+}
+
+.descriptionText {
+  width: 672px;
+  margin-top: 35px;
+  color: black;
+  font-size: 24px;
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-weight: 400;
+  word-wrap: break-word;
+}
+
+.descriptionText1 {
+  width: 672px;
+  margin-top: -50px;
+  color: black;
+  font-size: 24px;
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-weight: 400;
+  word-wrap: break-word;
+}
+
+.descriptionText2 {
+  width: auto;
+  margin-top: 25px;
+  color: black;
+  font-size: 24px;
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-weight: 400;
+  word-wrap: break-word;
+}
+
+.buttonContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  /* margin-top: 20px; */
+}
+
+.buttonContainer2 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 50px;
+}
+
+.button {
+  background: linear-gradient(90deg, #E4815A 0%, #F9D423 100%);
+  color: white;
+  width: 300px;
+  height: 90px;
+  border-radius: 30px;
+  border: none;
+  font-size: 20px;
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 16px rgba(0, 0, 0, 0.2);
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.button2 {
+  background: white;
+  color: black;
+  width: 500px;
+  height: 70px;
+  border-radius: 10px;
+  border: none;
+  font-size: 20px;
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.rightBox {
+  flex: 1;
+  background-color: white;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.questionContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.questionBlock {
+  margin-bottom: 20px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  margin-left: -80px;
+}
+
+.optionsContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+  margin-top: 15px;
+}
+
+.optionButton {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  /* border-radius: 30px;  */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+.optionButtonLarge {
+  width: 80px;
+  height: 80px;
+  /* border-radius: 30px;  */
+  border-radius: 50%;
+  
+  /* margin-top: -20px; */
+}
+
+.optionButtonMedium {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  /* border-radius: 30px;  */
+  /* margin-top: -20px; */
+}
+
+.optionButtonSmall {
+  /* margin-top: -20px; */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  /* border-radius: 30px;  */
+}
+
+.optionLabelLeft {
+  font-size: 24px;
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-weight: 400;
+  margin-right: 10px;
+  color: #de6535;
+  
+}
+
+.optionLabelRight {
+  font-size: 24px;
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-weight: 400;
+  margin-left: 10px;
+  color: #0357AF;
+}
+
+.nextButton {
+  background: linear-gradient(90deg, #E4815A 0%, #F9D423 100%);
+  color: white;
+  width: 180px;
+  height: 55px;
+  border-radius: 15px;
+  border: none;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 25px;
+}
+
+.backButton {
+  background: #ffffff;
+  color: black;
+  width: 180px;
+  height: 55px;
+  border-radius: 15px;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: -140px;
+  border: 1px solid #ccc;
+  margin-top: 25px;
+}
+
+.stepTitle {
+  color: black;
+  font-size: 24px;
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-weight: 400;
+  word-wrap: break-word;
+}
+
+.stepDescription {
+  color: black;
+  font-size: 12px;
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-weight: 400;
+  word-wrap: break-word;
+}
+
+.stepDescription2 {
+  color: black;
+  font-size: 17px;
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-weight: 100;
+  word-wrap: break-word;
+}
+
+/* .custom-button {
+  font-size: 24px; 
+  padding: 10px 20px;
+  width: 500px;
+  height: 55px;
+  text-align: center;
+  color: black; 
+  font-family: "Noto Sans Thai", sans-serif; 
+  font-weight: 400; 
+  word-wrap: break-word;
+  border-radius: 30px; 
+  border: 1px solid white; 
+  justify-content: center; 
+  align-items: center; 
+  gap: 10px; 
+  display: block;
+ 
+} */
+

@@ -41,21 +41,23 @@ body {
   min-height: 150px; /* ปรับค่าตามที่ต้องการ */
 }
 /* ปรับขนาดปุ่ม */
-.custom-button {
-  font-size: 24px; /* ปรับขนาดตัวอักษร */
-  padding: 10px 20px; /* ปรับขนาดของปุ่ม */
-  width: 500px;
-  height: 55px;
-  text-align: center;
-  color: black; 
-  font-family: "Noto Sans Thai", sans-serif; /* แก้ไขให้ถูกต้อง */
-  font-weight: 400; 
-  word-wrap: break-word;
+/* .custom-button {
   border-radius: 30px; 
-  border: 1px solid white; 
-  justify-content: center; 
-  align-items: center; 
-  gap: 10px; 
-  display: block;
-  margin-top: 20px;
-}
+ 
+} */
+ /* margin-top: 20px; */
+ /* font-size: 24px; 
+ padding: 10px 20px;
+ width: 500px;
+ height: 55px;
+ text-align: center;
+ color: black; 
+ font-family: "Noto Sans Thai", sans-serif; 
+ font-weight: 400; 
+ word-wrap: break-word;
+ border-radius: 30px; 
+ border: 1px solid white; 
+ justify-content: center; 
+ align-items: center; 
+ gap: 10px; 
+ display: block; */
