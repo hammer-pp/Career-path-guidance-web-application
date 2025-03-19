@@ -459,11 +459,11 @@ const TestPage = () => {
                   description: <div className={styles.stepDescription}>{'< 1 นาที'}</div>,
                 },
                 {
-                  title: <div className={styles.stepTitle}>เอกลักษณ์บุคลิกภาพของคุณ</div>,
+                  title: <div className={styles.stepTitle}>แบบทดสอบบุคลิกภาพ</div>,
                   description: <div className={styles.stepDescription}>{'< 10 นาที'}</div>,
                 },
                 {
-                  title: <div className={styles.stepTitle}>คุณลักษณะที่น่าสนใจของคุณ</div>,
+                  title: <div className={styles.stepTitle}>แบบทดสอบความสนใจ</div>,
                   description: <div className={styles.stepDescription}>{'< 10 นาที'}</div>,
                 },
                 {

@@ -10,6 +10,7 @@ import HomePage from "./pages/HomePage";
 import './App.css';
 import Logo from './assets/Logo.png';
 import { Button } from 'antd';
+import styles from './styles/App.module.css'; // นำเข้าไฟล์ CSS Modules
 
 const App = () => {
   return (
@@ -24,10 +25,10 @@ const AppContent = () => {
   const isLoginOrRegisterPage = location.pathname === "/login" || location.pathname === "/register";
 
   return (
-    <div style={styles.container}>
+    <div className={styles.container}>
       {/* Header Section */}
       {!isLoginOrRegisterPage && (
-        <header style={styles.header}>
+        <header className={styles.header}>
           <Link to="/" style={{ textDecoration: "none" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "3px", cursor: "pointer" }}>
               <img src={Logo} alt="Logo" style={{ width: "55px", height: "50px" }} />
@@ -38,25 +39,19 @@ const AppContent = () => {
           </Link>
 
           <nav>
-            <ul style={styles.navList}>
+            <ul className={styles.navList}>
               <li>
                 <NavLink
                   to="/test"
-                  style={({ isActive }) => ({
-                    ...styles.navLink,
-                    ...(isActive ? styles.activeNavLink : {}),
-                  })}
+                  className={({ isActive }) => isActive ? `${styles.navLink} ${styles.activeNavLink}` : styles.navLink}
                 >
-                  แบบทดสอบ
+                  เส้นทางอนาคต
                 </NavLink>
               </li>
               <li>
                 <NavLink
                   to="/university"
-                  style={({ isActive }) => ({
-                    ...styles.navLink,
-                    ...(isActive ? styles.activeNavLink : {}),
-                  })}
+                  className={({ isActive }) => isActive ? `${styles.navLink} ${styles.activeNavLink}` : styles.navLink}
                 >
                   มหาวิทยาลัย
                 </NavLink>
@@ -64,10 +59,7 @@ const AppContent = () => {
               <li>
                 <NavLink
                   to="/news"
-                  style={({ isActive }) => ({
-                    ...styles.navLink,
-                    ...(isActive ? styles.activeNavLink : {}),
-                  })}
+                  className={({ isActive }) => isActive ? `${styles.navLink} ${styles.activeNavLink}` : styles.navLink}
                 >
                   ข่าวสาร
                 </NavLink>
@@ -75,10 +67,7 @@ const AppContent = () => {
               <li>
                 <NavLink
                   to="/about"
-                  style={({ isActive }) => ({
-                    ...styles.navLink,
-                    ...(isActive ? styles.activeNavLink : {}),
-                  })}
+                  className={({ isActive }) => isActive ? `${styles.navLink} ${styles.activeNavLink}` : styles.navLink}
                 >
                   เกี่ยวกับเรา
                 </NavLink>
@@ -87,12 +76,12 @@ const AppContent = () => {
           </nav>
           <div style={{ marginLeft: "auto", display: "flex", gap: "10px" }}>
             <Link to="/login" style={{ textDecoration: "none" }}>
-              <Button type="primary" style={styles.loginButton}>
+              <Button type="primary" className={styles.loginButton}>
                 <span>เข้าสู่ระบบ</span>
               </Button>
             </Link>
             <Link to="/register" style={{ textDecoration: "none" }}>
-              <Button type="primary" style={styles.registerButton}>
+              <Button type="primary" className={styles.registerButton}>
                 <span>ลงทะเบียน</span>
               </Button>
             </Link>
@@ -112,78 +101,6 @@ const AppContent = () => {
       </Routes>
     </div>
   );
-};
-
-// Styles
-const styles = {
-  container: {
-    display: "flex",
-    flexDirection: "column",
-    minHeight: "100vh",
-    background: "linear-gradient(90deg, #0357AF 0%, white 100%)",
-  },
-  header: {
-    background: "linear-gradient(90deg, #0357AF 0%, white 100%)",
-    padding: "32px 64px",
-    display: "flex",
-    alignItems: "center",
-    gap: "50px",
-  },
-  navList: {
-    listStyle: "none",
-    display: "flex",
-    gap: "1.5rem",
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: "auto",
-  },
-  navLink: {
-    textDecoration: "none",
-    color: "black",
-    fontSize: "24px",
-    fontWeight: 400,
-    wordWrap: "break-word",
-    padding: "10px 20px",
-    borderRadius: "25px",
-    transition: "background-color 0.3s",
-    margin: "0 10px",
-    boxSizing: "border-box",
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  activeNavLink: {
-    backgroundColor: "#F4F4F4",
-    borderRadius: "25px",
-    width: '170px',
-    height: '50px',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '24px',
-    lineHeight: '50px',
-    boxSizing: "border-box",
-  },
-  loginButton: {
-    background: '#F4F4F4',
-    color: 'black',
-    width: '160px',
-    height: '50px',
-    borderRadius: '25px',
-    border: 'none',
-    fontSize: '20px',
-    fontFamily: "'Noto Sans Thai', sans-serif",
-    fontWeight: '400',
-  },
-  registerButton: {
-    background: 'linear-gradient(90deg, #FFE259 0%, #E4815A 100%)',
-    color: 'white',
-    width: '160px',
-    height: '50px',
-    borderRadius: '25px',
-    border: 'none',
-    fontSize: '20px',
-    fontFamily: "'Noto Sans Thai', sans-serif",
-    fontWeight: '400',
-  }
 };
 
 export default App;
