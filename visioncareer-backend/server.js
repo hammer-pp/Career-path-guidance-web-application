@@ -10,6 +10,12 @@ const app = express();
 app.use(cors());
 app.use(express.json()); // ให้รองรับ JSON request body
 
+app.use(cors({
+  origin: "http://localhost:5173", // URL ของ Frontend (React)
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
+
 // ทดสอบ API และเชื่อมต่อฐานข้อมูล
 app.get("/test-db", async (req, res) => {
   try {
@@ -31,18 +37,31 @@ app.get("/users", async (req, res) => {
     }
   });
 
-  app.post("/users", async (req, res) => {
-    try {
-      const { fullname, email, password } = req.body;  // ใช้ fullname แทน full_name
-      const [newUser] = await db("users")
-        .insert({ fullname, email, password })  // ใช้ fullname แทน full_name
-        .returning(["userid", "fullname", "email"]);
-      res.json(newUser);
-    } catch (error) {
-      console.error("Error inserting user:", error);
-      res.status(500).json({ error: error.message });
+// ✅ อัปเดต API สมัครสมาชิก (Register)
+app.post("/users", async (req, res) => {
+  const { fullname, email, password } = req.body;
+
+  try {
+    // ✅ ตรวจสอบว่าอีเมลซ้ำหรือไม่
+    const existingUser = await db("users").where({ email }).first();
+    if (existingUser) {
+      return res.status(400).json({ error: "อีเมลนี้ถูกใช้ไปแล้ว" });
     }
-  });
+
+    // ✅ เข้ารหัสรหัสผ่านก่อนบันทึก
+    const hashedPassword = await bcrypt.hash(password, 10);
+    console.log("🛠️ Debug - Hashed Password:", hashedPassword); // ✅ ตรวจสอบค่าที่ถูกเข้ารหัส
+
+    // ✅ บันทึกผู้ใช้ลงฐานข้อมูล
+    await db("users").insert({ fullname, email, password: hashedPassword });
+
+    res.status(201).json({ message: "สมัครสมาชิกสำเร็จ!" });
+  } catch (error) {
+    console.error("❌ Error during register:", error);
+    res.status(500).json({ error: "เกิดข้อผิดพลาดในการสมัครสมาชิก" });
+  }
+});
+
 
   // ดึงข้อมูลผู้ใช้ตาม ID
 app.get("/users/:id", async (req, res) => {
@@ -79,48 +98,35 @@ app.put("/users/:id", async (req, res) => {
   }
 });
 
-app.post("/users", async (req, res) => {
-  try {
-    const { fullname, email, password } = req.body;
-    const hashedPassword = bcrypt.hashSync(password, 10);
-    
-    const [newUser] = await db("users")
-      .insert({ fullname, email, password: hashedPassword })
-      .returning(["userid", "fullname", "email"]);
-
-    res.json(newUser);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
 
 app.post("/login", async (req, res) => {
-  console.log("Login route was hit");  // ✅ ตรวจสอบว่า API ถูกเรียกจริง
+  const { email, password } = req.body;
 
   try {
-    const { email, password } = req.body;
-    console.log("Received data:", req.body);  // ✅ เช็คค่าที่ส่งมา
+    // ✅ ดึงข้อมูลผู้ใช้
+    const user = await db("users").where({ email }).first();
 
-    const user = await db("users").where("email", email).first();
+    console.log("🛠️ Debug - User from DB:", user); // ✅ ตรวจสอบค่าที่ดึงมา
+
     if (!user) {
-      console.log("User not found");
-      return res.status(404).json({ error: "User not found" });
+      return res.status(401).json({ error: "อีเมลหรือรหัสผ่านไม่ถูกต้อง" });
     }
 
-    if (!bcrypt.compareSync(password, user.password)) {
-      console.log("Invalid password");
-      return res.status(401).json({ error: "Invalid credentials" });
+    // ✅ ตรวจสอบรหัสผ่าน
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    console.log("🛠️ Debug - Password Match:", passwordMatch); // ✅ เช็คว่ารหัสผ่านตรงหรือไม่
+
+    if (!passwordMatch) {
+      return res.status(401).json({ error: "อีเมลหรือรหัสผ่านไม่ถูกต้อง" });
     }
 
-    const token = jwt.sign({ id: user.userid, email: user.email }, "SECRET_KEY", { expiresIn: "1h" });
-    console.log("Token generated:", token);
-
-    res.json({ token });
+    res.status(200).json({ message: "เข้าสู่ระบบสำเร็จ!", user });
   } catch (error) {
-    console.error("Login error:", error);
-    res.status(500).json({ error: error.message });
+    console.error("❌ Error during login:", error);
+    res.status(500).json({ error: "เกิดข้อผิดพลาดในการเข้าสู่ระบบ" });
   }
 });
+
 
 app.post("/results", async (req, res) => {
   try {

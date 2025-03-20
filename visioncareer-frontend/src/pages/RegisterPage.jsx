@@ -1,30 +1,35 @@
 // src/pages/RegisterPage.jsx
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { registerUser } from "../api";
 import styles from '../styles/RegisterPage.module.css'; // นำเข้าไฟล์ CSS Modules
 
 const RegisterPage = () => {
-  const [name, setName] = useState("");
+  const [fullname, setFullname] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (name === "" || email === "" || password === "" || confirmPassword === "") {
-      alert("กรุณากรอกข้อมูลให้ครบถ้วน!");
-    } else if (password !== confirmPassword) {
-      alert("รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน!");
-    } else {
-      alert("ลงทะเบียนสำเร็จ!");
+    if (password !== confirmPassword) {
+      alert("รหัสผ่านไม่ตรงกัน");
+      return;
+    }
+    const data = await registerUser(fullname, email, password);
+    if (data) {
+      alert("สมัครสมาชิกสำเร็จ!");
       navigate("/login");
-      // เพิ่มโค้ดสำหรับส่งข้อมูลไปยังเซิร์ฟเวอร์ที่นี่
+    } else {
+      alert("สมัครสมาชิกไม่สำเร็จ");
     }
   };
 
+
   return (
     <div className={styles.container}>
+      {/* ส่วนซ้าย */}
       <div className={styles.leftSide}>
         <h1 className={styles.brandName}>VisionCareer</h1>
         <p className={styles.tagline}>ค้นหาเส้นทางที่ใช่สำหรับคุณ</p>
@@ -37,71 +42,52 @@ const RegisterPage = () => {
           <div className={styles.circle}></div>
         </div>
       </div>
+
+      {/* ส่วนขวา */}
       <div className={styles.rightSide}>
-        <h2 className={styles.welcomeText}>สวัสดี</h2>
-        <p className={styles.welcomeSubText}>ยินดีต้อนรับ</p>
+        <h2 className={styles.welcomeText}>สมัครสมาชิก</h2>
+        <p className={styles.welcomeSubText}>สร้างบัญชีของคุณ</p>
+
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.inputGroup}>
             <input
               type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={fullname}
+              onChange={(e) => setFullname(e.target.value)}
               required
-              className={styles.input}
-              placeholder=" "
+              placeholder="ชื่อเต็ม"
             />
-            <label htmlFor="name" className={styles.label}>
-              ชื่อ
-            </label>
           </div>
           <div className={styles.inputGroup}>
             <input
               type="email"
-              id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className={styles.input}
-              placeholder=" "
+              placeholder="อีเมล"
             />
-            <label htmlFor="email" className={styles.label}>
-              อีเมล
-            </label>
           </div>
           <div className={styles.inputGroup}>
             <input
               type="password"
-              id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className={styles.input}
-              placeholder=" "
+              placeholder="รหัสผ่าน"
             />
-            <label htmlFor="password" className={styles.label}>
-              รหัสผ่าน
-            </label>
           </div>
           <div className={styles.inputGroup}>
             <input
               type="password"
-              id="confirmPassword"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              className={styles.input}
-              placeholder=" "
+              placeholder="ยืนยันรหัสผ่าน"
             />
-            <label htmlFor="confirmPassword" className={styles.label}>
-              ยืนยันรหัสผ่าน
-            </label>
           </div>
-          <button type="submit" className={styles.buttonregister}>
-            ลงทะเบียน
-          </button>
+          <button type="submit" className={styles.buttonregister}>สมัครสมาชิก</button>
           <p className={styles.registerLink}>
-            มีบัญชีอยู่แล้ว? <a href="/login" className={styles.link}>เข้าสู่ระบบ</a>
+            มีบัญชีอยู่แล้ว? <Link to="/login" className={styles.link}>เข้าสู่ระบบ</Link>
           </p>
         </form>
       </div>
