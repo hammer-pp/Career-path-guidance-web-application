@@ -5,7 +5,6 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const navigate = useNavigate();  // ✅ ใช้ navigate เพื่อนำทางหลัง Logout
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
