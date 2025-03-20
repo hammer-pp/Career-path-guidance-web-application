@@ -28,9 +28,11 @@ const LoginPage = () => {
       <div className={styles.leftSide}>
         <h1 className={styles.brandName}>VisionCareer</h1>
         <p className={styles.tagline}>ค้นหาเส้นทางที่ใช่สำหรับคุณ</p>
-        <Link to="/" className={styles.homeButton}>
-          <span className={styles.homeButtonText}>กลับสู่หน้าหลัก</span>
-        </Link>
+        <Link to="/" style={{ textDecoration: "none" }}>
+          <div className={styles.homeButton}>
+            <div className={styles.homeButtonText}>กลับสู่หน้าหลัก</div>
+          </div>
+          </Link>
         <div className={styles.circleContainer}>
           <div className={styles.circle}></div>
         </div>
@@ -48,6 +50,7 @@ const LoginPage = () => {
               value={email} 
               onChange={(e) => setEmail(e.target.value)} 
               required 
+              className={styles.input}
               placeholder="อีเมล"
             />
           </div>
@@ -57,15 +60,17 @@ const LoginPage = () => {
               value={password} 
               onChange={(e) => setPassword(e.target.value)} 
               required 
+              className={styles.input}
               placeholder="รหัสผ่าน"
             />
           </div>
           <button type="submit" className={styles.buttonlogin}>เข้าสู่ระบบ</button>
-        </form>
-
-        <p className={styles.registerLink}>
+          <p className={styles.registerLink}>
           ยังไม่มีบัญชี? <Link to="/register" className={styles.link}>สมัครสมาชิก</Link>
         </p>
+        </form>
+
+        
       </div>
     </div>
   );

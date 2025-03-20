@@ -55,6 +55,7 @@ const RegisterPage = () => {
               value={fullname}
               onChange={(e) => setFullname(e.target.value)}
               required
+              className={styles.input}
               placeholder="ชื่อเต็ม"
             />
           </div>
@@ -64,6 +65,7 @@ const RegisterPage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              className={styles.input}
               placeholder="อีเมล"
             />
           </div>
@@ -73,6 +75,7 @@ const RegisterPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              className={styles.input}
               placeholder="รหัสผ่าน"
             />
           </div>
@@ -82,6 +85,7 @@ const RegisterPage = () => {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
+              className={styles.input}
               placeholder="ยืนยันรหัสผ่าน"
             />
           </div>
