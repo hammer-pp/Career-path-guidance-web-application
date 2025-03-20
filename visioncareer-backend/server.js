@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json()); // ให้รองรับ JSON request body
 
 app.use(cors({
-  origin: "http://localhost:5173", // URL ของ Frontend (React)
+  origin: ["http://localhost:5173", "http://192.168.1.78:5173"], // URL ของ Frontend (React)
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
@@ -39,28 +39,31 @@ app.get("/users", async (req, res) => {
 
 // ✅ อัปเดต API สมัครสมาชิก (Register)
 app.post("/users", async (req, res) => {
+  console.log("📥 Incoming request data:", req.body); // ✅ ตรวจสอบข้อมูลที่ส่งมา
+
   const { fullname, email, password } = req.body;
-
-  try {
-    // ✅ ตรวจสอบว่าอีเมลซ้ำหรือไม่
-    const existingUser = await db("users").where({ email }).first();
-    if (existingUser) {
-      return res.status(400).json({ error: "อีเมลนี้ถูกใช้ไปแล้ว" });
-    }
-
-    // ✅ เข้ารหัสรหัสผ่านก่อนบันทึก
-    const hashedPassword = await bcrypt.hash(password, 10);
-    console.log("🛠️ Debug - Hashed Password:", hashedPassword); // ✅ ตรวจสอบค่าที่ถูกเข้ารหัส
-
-    // ✅ บันทึกผู้ใช้ลงฐานข้อมูล
-    await db("users").insert({ fullname, email, password: hashedPassword });
-
-    res.status(201).json({ message: "สมัครสมาชิกสำเร็จ!" });
-  } catch (error) {
-    console.error("❌ Error during register:", error);
-    res.status(500).json({ error: "เกิดข้อผิดพลาดในการสมัครสมาชิก" });
+  if (!fullname || !email || !password) {
+    return res.status(400).json({ error: "Missing required fields" });
   }
+
+  // ตรวจสอบว่ามีอีเมลนี้ในระบบหรือยัง
+  const existingUser = await db("Users").where({ email }).first();
+  if (existingUser) {
+    return res.status(400).json({ error: "Email already exists" });
+  }
+
+  // เข้ารหัสรหัสผ่านก่อนบันทึก
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const newUser = await db("Users").insert({
+    fullname,
+    email,
+    password: hashedPassword,
+  });
+
+  console.log("✅ User registered successfully:", newUser);
+  res.status(201).json({ message: "User registered successfully" });
 });
+
 
 
   // ดึงข้อมูลผู้ใช้ตาม ID
@@ -202,6 +205,6 @@ app.get("/recommendations/:user_id", async (req, res) => {
 
 // ตั้งค่าพอร์ต
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(5000, "0.0.0.0", () => {
+  console.log("Server running on port 5000");
 });

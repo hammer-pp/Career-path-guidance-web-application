@@ -1,5 +1,6 @@
-import { createContext, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { createContext, useState, useContext, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // ถ้ามี navigation
+
 
 const AuthContext = createContext();
 

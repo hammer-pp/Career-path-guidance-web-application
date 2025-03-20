@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_BACKEND_URL;
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 // ✅ ฟังก์ชันล็อกอิน
 export const loginUser = async (email, password) => {
@@ -18,18 +18,29 @@ export const loginUser = async (email, password) => {
 };
 
 // ✅ ฟังก์ชันสมัครสมาชิก
-export const registerUser = async (fullname, email, password) => {
+export async function registerUser(fullname, email, password) {
+  console.log("📤 Sending request to API:", { fullname, email, password });
+
   try {
-    const response = await fetch(`${API_URL}/users`, {
+    const response = await fetch("http://192.168.1.78:5000/users", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({ fullname, email, password }),
     });
 
-    if (!response.ok) throw new Error("Registration failed");
-    return await response.json();
+    const data = await response.json();
+    console.log("📥 Response from API:", data);
+
+    if (!response.ok) {
+      throw new Error(data.error || "Registration failed");
+    }
+
+    return data;
   } catch (error) {
-    console.error("Registration failed:", error);
-    return null;
+    console.error("⚠️ Registration failed:", error);
+    throw error;
   }
-};
+}
+
