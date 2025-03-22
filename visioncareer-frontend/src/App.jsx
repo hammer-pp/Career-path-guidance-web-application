@@ -90,8 +90,8 @@ const AppContent = () => {
       {/* Routes */}
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/test" element={<PrivateRoute><TestPage /></PrivateRoute>} />
-        <Route path="/university" element={<PrivateRoute><UniversityPage /></PrivateRoute>} />
+        <Route path="/test" element={<TestPage />}/>
+        <Route path="/university" element={<UniversityPage />}/>
         <Route path="/news" element={<NewsPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/login" element={<LoginPage />} />
