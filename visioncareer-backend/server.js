@@ -173,6 +173,16 @@ app.get("/results/:user_id", async (req, res) => {
   }
 });
 
+app.get("/universities", async (req, res) => {
+  try {
+    const universities = await db.select("*").from("universities");
+    res.json(universities);
+  } catch (error) {
+    console.error("Error fetching universities:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 app.get("/recommendations/:user_id", async (req, res) => {
   try {
     const { user_id } = req.params;

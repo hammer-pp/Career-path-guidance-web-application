@@ -22,7 +22,7 @@ export async function registerUser(fullname, email, password) {
   console.log("📤 Sending request to API:", { fullname, email, password });
 
   try {
-    const response = await fetch("http://192.168.1.78:5000/users", {
+    const response = await fetch(`${API_URL}/users`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -44,3 +44,8 @@ export async function registerUser(fullname, email, password) {
   }
 }
 
+export async function fetchUniversities() {
+  const response = await fetch(`${API_URL}/universities`);
+  if (!response.ok) throw new Error("Failed to fetch universities");
+  return await response.json();
+}
