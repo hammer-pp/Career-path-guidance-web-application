@@ -10,7 +10,8 @@ import AboutPage from "./pages/AboutPage";
 import HomePage from "./pages/HomePage";
 import './App.css';
 import Logo from './assets/Logo.png';
-import { Button } from 'antd';
+import { Button,Avatar } from 'antd';
+import { UserOutlined } from '@ant-design/icons';
 import styles from './styles/App.module.css'; // นำเข้าไฟล์ CSS Modules
 
 const App = () => {
@@ -69,10 +70,12 @@ const AppContent = () => {
 
           <div style={{ marginLeft: "auto", display: "flex", gap: "10px" }}>
             {user ? (
-              <>
-                <span style={{ fontSize: "16px", fontWeight: "bold" }}>สวัสดี, {user.fullname}</span>
-                <Button type="primary" className={styles.logoutButton} onClick={logout}> ออกจากระบบ</Button>
-              </>
+              <div className={styles.userInfo}>
+                <span className={styles.username}>{user.fullname}</span>
+                {/* <span style={{ fontSize: "16px", fontWeight: "bold" }}>สวัสดี, {user.fullname}</span> */}
+                <Avatar size="large" icon={<UserOutlined />} className={styles.avatar} onClick={logout} />
+                {/* <Button type="primary" className={styles.logoutButton} onClick={logout}> ออกจากระบบ</Button> */}
+                </div>
             ) : (
               <>
                 <Link to="/login" style={{ textDecoration: "none" }}>
