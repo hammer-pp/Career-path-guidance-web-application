@@ -39,11 +39,6 @@ const UniversityPage = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <div className={styles.filterOptions}>
-              <span className={styles.filterOption}>ทั้งหมด</span>
-              <span className={styles.filterOption}>คะแนน</span>
-              <span className={styles.filterOption}>ความสนใจ</span>
-            </div>
           </div>
         </div>
 
