@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
 import { Button, Steps } from 'antd';
 // import '../styles/TestPage.css'; // นำเข้าไฟล์ CSS
 import styles from '../styles/TestPage.module.css'; // นำเข้าไฟล์ CSS Modules
 import { personalityQuestions, interestQuestions } from '../data/questions';
+import AuthContext from "./AuthContext";
+import React, { useState, useContext } from 'react';
+
+const API_URL = "http://localhost:5001"; // Flask
+const BACKEND_URL = "http://localhost:5000"; // Node.js
 
 const { Step } = Steps;
-
 
 //สร้างข้อมูลคำถาม (ความชอบ 48 ข้อ)
 // const interestQuestions = [
@@ -25,6 +28,9 @@ const { Step } = Steps;
 
 
 const TestPage = () => {
+  const { user } = useContext(AuthContext);
+  const [answers, setAnswers] = useState(Array(81).fill(0));
+  const [result, setResult] = useState(null);
   const [step, setStep] = useState(0);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [personalityAnswers, setPersonalityAnswers] = useState({});
@@ -47,6 +53,85 @@ const TestPage = () => {
            option === "ไม่ชอบ" || option === "ไม่เห็นด้วย" ? 2 :
            option === "ไม่ชอบอย่างมาก" || option === "ไม่เห็นด้วยอย่างมาก" ? 1 : 0;
   };
+
+  const handleChange = (index, value) => {
+    const newAnswers = [...answers];
+    newAnswers[index] = parseInt(value);
+    setAnswers(newAnswers);
+  };
+  
+  const handleSubmit = async () => {
+    const combinedAnswers = {
+      ...personalityAnswers,
+      ...Object.fromEntries(
+        Object.entries(interestAnswers).map(([key, value]) => [parseInt(key) + 33, value])
+      ),
+    };
+  
+    const combinedArray = Array(81).fill(0).map((_, index) => combinedAnswers[index]);
+  
+    console.log("✅ Answers to send:", combinedArray);
+    console.log("✅ Answers length:", combinedArray.length);
+  
+    if (combinedArray.length !== 81 || combinedArray.includes(undefined)) {
+      alert("กรุณาทำแบบทดสอบให้ครบทุกข้อ");
+      return;
+    }
+  
+    try {
+      let testid = null;
+  
+      if (user) {
+        const saveTestRes = await fetch(`${BACKEND_URL}/save-test`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            user_id: user.userid,
+            answers: combinedArray,
+          }),
+        });
+  
+        const testData = await saveTestRes.json();
+        if (!saveTestRes.ok) throw new Error(testData.error || "บันทึกแบบทดสอบไม่สำเร็จ");
+        testid = testData.testid;
+      }
+  
+      // เรียก predict จาก Flask (ไม่ว่าล็อกอินหรือไม่)
+      const predictRes = await fetch(`${API_URL}/predict`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ answers: combinedArray, user_id: user?.userid || null }),
+      });
+  
+      const predictData = await predictRes.json();
+      if (!predictRes.ok) throw new Error(predictData.error || "เกิดข้อผิดพลาดจากการประมวลผล");
+  
+      setResult(predictData); // แสดงผลลัพธ์
+  
+      if (user && testid) {
+        // บันทึก recommendation ลง DB
+        const saveReco = await fetch(`${BACKEND_URL}/results`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            user_id: user.userid,
+            holland_group: predictData.holland_group,
+            big5_group: predictData.big5_group,
+          }),
+        });
+  
+        const recoData = await saveReco.json();
+        if (!saveReco.ok) throw new Error(recoData.error || "บันทึกผลลัพธ์ไม่สำเร็จ");
+  
+        console.log("✅ บันทึก recommendation แล้ว:", recoData);
+      }
+  
+    } catch (error) {
+      console.error("❌ Error:", error);
+      alert("เกิดข้อผิดพลาด: " + error.message);
+    }
+  };  
+  
 
   const handleAnswer = (answer, questionIndex) => {
     let score = getScoreFromOption(answer);
@@ -198,6 +283,7 @@ const TestPage = () => {
                       } else {
                         setStep(3);
                         handleCompleteTest(interestQuestions, interestAnswers);
+                        handleSubmit();
                       }
                     }
                   }}

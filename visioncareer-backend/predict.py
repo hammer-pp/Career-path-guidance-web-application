@@ -2,16 +2,16 @@ import os
 import pandas as pd
 import numpy as np
 import xgboost as xgb
-import requests  
+import requests
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 BACKEND_URL = "http://localhost:5000"
 
-# 📌 กำหนด path ให้แน่นอน
 ML_DIR = os.path.join(os.path.dirname(__file__), "../ML")
 
-# โหลดโมเดล
 models = {
     "holland": xgb.Booster(),
     "big5": xgb.Booster()
@@ -24,7 +24,6 @@ try:
 except Exception as e:
     print(f"❌ เกิดข้อผิดพลาดในการโหลดโมเดล: {e}")
 
-# ฟีเจอร์เซ็ตของแต่ละโมเดล
 holland_features = ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8',
                     'I1', 'I2', 'I3', 'I4', 'I5', 'I6', 'I7', 'I8',
                     'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8',
@@ -45,36 +44,36 @@ def home():
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
-        data = request.json.get("answers", [])
-        user_id = request.json.get("user_id")  # ✅ รับ user_id จาก frontend
+        data = request.get_json()
+        print("📥 Raw data from frontend:", data)
+        answers = data.get("answers", [])
+        user_id = data.get("user_id", None)
 
-        # ✅ ตรวจสอบว่าอินพุตมี 81 ค่า
-        expected_features = len(holland_features) + len(big5_features)
-        if len(data) != expected_features:
-            return jsonify({
-                "error": f"Feature shape mismatch, expected: {expected_features}, got {len(data)}"
-            }), 400
+        if len(answers) != 81:
+            return jsonify({'error': f'Feature shape mismatch: expected 81, got {len(answers)}'}), 400
 
-        # ✅ แยกอินพุตให้แต่ละโมเดล
-        holland_data = data[:len(holland_features)]  # 48 ค่า
-        big5_data = data[len(holland_features):]  # 33 ค่า
+        answers_array = np.array(answers)
 
-        # ✅ แปลงเป็น DataFrame
+        # ✅ แก้ slice ให้ถูกต้อง
+        holland_data = answers_array[:48]
+        big5_data = answers_array[48:]
+
+        print("✅ Holland (48):", holland_data.tolist())
+        print("✅ Big5 (33):", big5_data.tolist())
+
         holland_df = pd.DataFrame([holland_data], columns=holland_features)
         big5_df = pd.DataFrame([big5_data], columns=big5_features)
 
-        # ✅ พยากรณ์ผลลัพธ์ (ใช้ argmax() แปลงค่า Probability → กลุ่ม)
         holland_pred = int(np.argmax(models["holland"].predict(xgb.DMatrix(holland_df))))
         big5_pred = int(np.argmax(models["big5"].predict(xgb.DMatrix(big5_df))))
 
         print(f"📌 กลุ่ม Holland: {holland_pred}, กลุ่ม Big5: {big5_pred}")
 
         predictions = {
-            "holland_group": holland_pred + 1,  # ให้เริ่มจาก 1 แทน 0
-            "big5_group": big5_pred + 1  # ให้เริ่มจาก 1 แทน 0
+            "holland_group": holland_pred + 1,
+            "big5_group": big5_pred + 1
         }
 
-        # ✅ ส่งผลลัพธ์ไปบันทึกใน Backend
         try:
             response = requests.post(f"{BACKEND_URL}/results", json={
                 "user_id": user_id,
@@ -90,6 +89,7 @@ def predict():
         return jsonify(predictions)
 
     except Exception as e:
+        print("❌ SERVER ERROR:", str(e))  # Log ข้อผิดพลาดเพื่อ Debug
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":

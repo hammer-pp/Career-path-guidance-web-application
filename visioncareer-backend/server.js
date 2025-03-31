@@ -3,7 +3,6 @@ const express = require("express");
 const db = require("./db"); // เชื่อมต่อฐานข้อมูลจากไฟล์ db.js
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-
 const cors = require("cors");
 
 const app = express();
@@ -63,8 +62,6 @@ app.post("/users", async (req, res) => {
   console.log("✅ User registered successfully:", newUser);
   res.status(201).json({ message: "User registered successfully" });
 });
-
-
 
   // ดึงข้อมูลผู้ใช้ตาม ID
 app.get("/users/:id", async (req, res) => {
@@ -130,48 +127,66 @@ app.post("/login", async (req, res) => {
   }
 });
 
+app.post("/save-test", async (req, res) => {
+  const { user_id, answers } = req.body;
 
-app.post("/results", async (req, res) => {
+  if (!user_id || !answers || answers.length !== 81) {
+    return res.status(400).json({ error: "Invalid data received." });
+  }
+
   try {
-    const { user_id, holland_group, big5_group } = req.body;
+    const now = new Date();
+    const inserted = await db("tests").insert({
+      userid: user_id,
+      score: JSON.stringify(answers),
+      createdat: now,
+    }).returning("testid");
 
-    // ตรวจสอบว่าผู้ใช้มีผลการทดสอบแล้วหรือไม่
-    const existingResult = await db("results").where("user_id", user_id).first();
-
-    if (existingResult) {
-      // อัปเดตผลลัพธ์เดิม
-      await db("results")
-        .where("user_id", user_id)
-        .update({ holland_group, big5_group });
-
-      return res.json({ message: "Updated existing test result successfully." });
-    } else {
-      // บันทึกผลลัพธ์ใหม่
-      await db("results").insert({ user_id, holland_group, big5_group });
-
-      return res.json({ message: "Test result saved successfully." });
-    }
+    console.log("✅ Saved test result to database:", inserted[0]);
+    res.status(200).json({ testid: inserted[0] });
   } catch (error) {
-    console.error("Error saving test result:", error);
+    console.error("❌ Failed to save test result:", error);
     res.status(500).json({ error: "Failed to save test result" });
   }
 });
 
-app.get("/results/:user_id", async (req, res) => {
-  try {
-    const { user_id } = req.params;
-    const result = await db("results").where("user_id", user_id).first();
+app.post("/results", async (req, res) => {
+  const { user_id, holland_group, big5_group } = req.body;
 
-    if (!result) {
-      return res.status(404).json({ error: "No test result found for this user." });
+  if (!user_id || !holland_group || !big5_group) {
+    return res.status(400).json({ error: "Missing required prediction data." });
+  }
+
+  try {
+    // ✅ ตรวจสอบ testid ล่าสุดของผู้ใช้
+    const latestTest = await db("tests")
+      .where("userid", user_id)
+      .orderBy("createdat", "desc")
+      .first();
+
+    const testid = latestTest ? latestTest.testid : null;
+
+    if (!testid) {
+      return res.status(400).json({ error: "No test record found to associate recommendation." });
     }
 
-    res.json(result);
-  } catch (error) {
-    console.error("Error retrieving test result:", error);
-    res.status(500).json({ error: "Failed to retrieve test result" });
+    // ✅ ค้นหา majorcareerid ที่เหมาะสมกับ group (เช่น mock data หรือ mapping ภายหลัง)
+    const careerid = holland_group; // เปลี่ยนให้ตรงกับ logic จริงของคุณ
+
+    const newRecommendation = await db("recommendations").insert({
+      userid: user_id,
+      testid: testid,
+      careerid: careerid, // สมมุติว่าใช้ Holland อย่างเดียวก่อน
+      createdat: new Date()
+    });
+
+    res.status(200).json({ message: "Prediction result saved", recommendationid: newRecommendation[0] });
+  } catch (err) {
+    console.error("❌ Failed to save prediction result:", err);
+    res.status(500).json({ error: "Server error while saving prediction result" });
   }
 });
+
 
 app.get("/universities", async (req, res) => {
   try {
