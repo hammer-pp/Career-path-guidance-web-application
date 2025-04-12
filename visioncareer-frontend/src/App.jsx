@@ -5,6 +5,8 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import TestPage from "./pages/TestPage";
 import UniversityPage from "./pages/UniversityPage";
+import UniversityDetailPage from "./pages/UniversityDetailPage";
+import FacultyDetailPage from "./pages/FacultyDetailPage";
 import NewsPage from "./pages/NewsPage";
 import AboutPage from "./pages/AboutPage";
 import HomePage from "./pages/HomePage";
@@ -99,6 +101,8 @@ const AppContent = () => {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/university/:id" element={<UniversityDetailPage />} />
+        <Route path="/university/:id/faculty/:facultyId" element={<FacultyDetailPage />} />
       </Routes>
     </div>
   );

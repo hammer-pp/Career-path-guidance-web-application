@@ -2,6 +2,7 @@
 .background {
   min-height: 87.3vh;
   padding: 20px;
+  padding-bottom: 60px;
 }
 
 .container {
@@ -81,18 +82,56 @@
 }
 
 .uniName {
-  font-size: 18px;
+  font-size: 24px;
   font-weight: bold;
   margin-bottom: 10px;
 }
 
-.moreInfoButton {
+/* .moreInfoButton {
   padding: 5px 10px;
   font-size: 14px;
   background-color: #f0f0f0;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  margin-top: 10px;
+} */
+.moreInfoButton {
+  background: linear-gradient(90deg, #E4815A 0%, #F9D423 100%);
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  margin-top: 15px;
+  transition: all 0.3s ease;
+  /* box-shadow: 0 4px 15px rgba(74, 107, 255, 0.3); */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 150px;
+}
+
+.moreInfoButton:hover {
+ 
+  background: linear-gradient(135deg, #3faff0, #0180CC);
+}
+
+/* .moreInfoButton:active {
+  transform: translateY(0);
+} */
+
+/* เพิ่มไอคอนลูกศร (ถ้าต้องการ) */
+/* .moreInfoButton::after {
+  content: '→';
+  margin-left: 8px;
+  transition: transform 0.3s;
+} */
+
+.moreInfoButton:hover::after {
+  transform: translateX(3px);
 }
 
 .rating {
@@ -123,8 +162,10 @@
 
 .moreOptions {
   cursor: pointer;
+  
 }
 
 .moreOptionsIcon {
   font-size: 24px;
+  
 }

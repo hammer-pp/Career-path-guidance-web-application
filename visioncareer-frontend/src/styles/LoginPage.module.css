@@ -93,7 +93,9 @@
   cursor: pointer;
   transition: 0.3s;
 }
-
+.buttonlogin:hover {
+  background: #0357AF;
+}
 .registerLink {
   text-align: center;
   margin-top: 20px;
@@ -103,6 +105,9 @@
 .link {
   color: #0357AF;
   text-decoration: none;
+}
+.link:hover {
+  color: #02458e;
 }
 
 .circleContainer {
@@ -137,6 +142,9 @@
   margin-top: 35px;
 }
 
+.homeButton:hover {
+  background: #0357AF;
+}
 .homeButtonText {
   color: white;
   font-size: 18px;

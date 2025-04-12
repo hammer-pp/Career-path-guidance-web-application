@@ -93,7 +93,9 @@
   cursor: pointer;
   transition: 0.3s;
 }
-
+.buttonregister:hover {
+  background: #0357AF;
+}
 .registerLink {
   text-align: center;
   margin-top: 20px;
@@ -104,7 +106,9 @@
   color: #0357AF;
   text-decoration: none;
 }
-
+.link:hover {
+  color: #02458e;
+}
 .circleContainer {
   width: 500px;
   height: 500px;
@@ -136,7 +140,9 @@
   display: inline-flex;
   margin-top: 35px;
 }
-
+.homeButton:hover {
+  background: #0357AF;
+}
 .homeButtonText {
   color: white;
   font-size: 18px;
