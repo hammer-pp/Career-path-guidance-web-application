@@ -109,7 +109,18 @@ const UniversityPage = () => {
 
         <div className={styles.content}>
           {filteredUniversities.map((uni) => (
-            <div key={uni.universityid} className={styles.card}>
+            <div 
+              key={uni.universityid} 
+              className={styles.card}
+              onClick={() => navigate(`/university/${uni.universityid}`)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  navigate(`/university/${uni.universityid}`);
+                }
+              }}
+            >
               <img 
                 src={uni.image} 
                 alt={uni.universityname} 
@@ -125,7 +136,10 @@ const UniversityPage = () => {
                 <p>{uni.location}</p>
                 <button 
                   className={styles.moreInfoButton}
-                  onClick={() => navigate(`/university/${uni.universityid}`)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/university/${uni.universityid}`);
+                  }}
                 >
                   ข้อมูลเพิ่มเติม
                 </button>

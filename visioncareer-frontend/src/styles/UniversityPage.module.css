@@ -64,13 +64,17 @@
 
 .card {
   display: flex;
-  align-items: center;
-  gap: 20px;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
+  align-items: flex-start;
+  gap: 25px;
+  padding: 25px;
+  border: 1px solid #eaeaea;
+  border-radius: 15px;
+  transition: transform 0.3s, box-shadow 0.3s;
 }
-
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
 .image {
   width: 120px;
   height: 120px;

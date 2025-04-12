@@ -8,6 +8,7 @@ import UniversityPage from "./pages/UniversityPage";
 import UniversityDetailPage from "./pages/UniversityDetailPage";
 import FacultyDetailPage from "./pages/FacultyDetailPage";
 import NewsPage from "./pages/NewsPage";
+import NewsDetailPage from './pages/NewsDetailPage';
 import AboutPage from "./pages/AboutPage";
 import HomePage from "./pages/HomePage";
 import './App.css';
@@ -98,6 +99,7 @@ const AppContent = () => {
         <Route path="/test" element={<TestPage />}/>
         <Route path="/university" element={<UniversityPage />}/>
         <Route path="/news" element={<NewsPage />} />
+        <Route path="/news/:id" element={<NewsDetailPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
