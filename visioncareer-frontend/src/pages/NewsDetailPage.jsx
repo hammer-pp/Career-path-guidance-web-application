@@ -28,19 +28,23 @@ const NewsDetailPage = () => {
             <span className={styles.newsDate}>เผยแพร่เมื่อ: {news.publishedat}</span>
           </div>
           
-          {news.imageUrl && (
-            <div className={styles.newsImageContainer}>
-              <img 
-                src={news.imageUrl} 
-                alt={news.title} 
-                className={styles.newsImage}
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = 'https://via.placeholder.com/800x400?text=No+Image';
-                }}
-              />
+          {news.imageUrls && news.imageUrls.length > 0 && (
+            <div className={styles.newsImagesContainer}>
+                {news.imageUrls.map((imageUrl, index) => (
+                <div key={index} className={styles.newsImageContainer}>
+                    <img 
+                    src={imageUrl} 
+                    alt={`${news.title} - ภาพที่ ${index + 1}`} 
+                    className={styles.newsImage}
+                    onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'https://via.placeholder.com/800x400?text=No+Image';
+                    }}
+                    />
+                </div>
+                ))}
             </div>
-          )}
+            )}
 
           <div className={styles.newsContent}>
             <p>{news.content}</p>
