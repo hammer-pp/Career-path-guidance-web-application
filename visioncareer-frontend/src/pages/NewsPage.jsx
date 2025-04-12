@@ -63,13 +63,17 @@ const NewsPage = () => {
   return (
     <div className={styles.background}>
       <div className={styles.container}>
+      <div className={styles.header}>
         <h1 className={styles.title}>ข่าวสาร ประกาศจากกปอ. และสถาบันต่าง ๆ</h1>
+        <div className={styles.filterBar}>
         <input
           className={styles.searchInput}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="ค้นหาข่าวสาร"
         />
+         </div>
+         </div>
         <div className={styles.content}>
           {currentNews.map((news) => (
             <div key={news.newsid} className={styles.card} onClick={() => handleClick(news)}>
@@ -89,13 +93,37 @@ const NewsPage = () => {
         </div>
         {totalPages > 1 && (
           <div className={styles.pagination}>
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className={styles.pageButton}
+            >
+              &lt;
+            </button>
+            
             {Array.from({ length: totalPages }, (_, i) => (
-              <button key={i} onClick={() => setCurrentPage(i + 1)}>{i + 1}</button>
+              <button
+                key={i}
+                onClick={() => setCurrentPage(i + 1)}
+                className={`${styles.pageButton} ${currentPage === i + 1 ? styles.active : ''}`}
+              >
+                {i + 1}
+              </button>
             ))}
+            
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className={styles.pageButton}
+            >
+              &gt;
+            </button>
           </div>
         )}
+        </div>
+       
       </div>
-    </div>
+    
   );
 };
 

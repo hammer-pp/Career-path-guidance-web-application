@@ -31,10 +31,14 @@ const NewsDetailPage = () => {
   return (
     <div className={styles.background}>
       <div className={styles.container}>
+      <div className={styles.header}>
         <button onClick={() => navigate(-1)} className={styles.backButton}>ย้อนกลับ</button>
         <h1 className={styles.newsTitle}>{news.title}</h1>
+        </div>
+        <div className={styles.newsDetail}>
+        <div className={styles.newsMeta}>
         <span className={styles.newsDate}>เผยแพร่เมื่อ: {formatThaiDate(news.publishedat)}</span>
-
+        </div>
         {news.imageurls?.length > 0 && (
           <div className={styles.newsImagesContainer}>
             {news.imageurls.map((url, i) => (
@@ -46,6 +50,9 @@ const NewsDetailPage = () => {
         <div className={styles.newsContent}>
           <p>{news.content}</p>
         </div>
+     
+      
+      </div>
       </div>
     </div>
   );
