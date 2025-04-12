@@ -198,6 +198,53 @@ app.get("/universities", async (req, res) => {
   }
 });
 
+app.get("/universities/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const university = await db("universities").where("universityid", id).first();
+    if (!university) {
+      return res.status(404).json({ error: "ไม่พบมหาวิทยาลัยนี้" });
+    }
+    res.json(university);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET คณะทั้งหมดของมหาวิทยาลัย
+app.get("/universities/:id/faculties", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const faculties = await db("university_faculty as uf")
+      .join("faculties as f", "uf.facultyid", "=", "f.facultyid")
+      .where("uf.universityid", id)
+      .select("f.facultyid", "f.facultyname", "f.description");
+
+    res.json(faculties);
+  } catch (err) {
+    console.error("❌ Error fetching faculties:", err);
+    res.status(500).json({ error: "Failed to fetch faculties" });
+  }
+});
+
+// GET สาขาของคณะในมหาวิทยาลัยนั้น
+app.get("/universities/:universityId/faculties/:facultyId/majors", async (req, res) => {
+  try {
+    const { universityId, facultyId } = req.params;
+    const majors = await db("university_major as um")
+      .join("faculty_major as fm", "um.majorid", "=", "fm.majorid")
+      .join("majors as m", "um.majorid", "=", "m.majorid")
+      .where("um.universityid", universityId)
+      .andWhere("fm.facultyid", facultyId)
+      .select("m.majorid", "m.majorname", "m.description");
+
+    res.json(majors);
+  } catch (err) {
+    console.error("❌ Error fetching majors:", err);
+    res.status(500).json({ error: "Failed to fetch majors" });
+  }
+});
+
 app.get("/recommendations/:user_id", async (req, res) => {
   try {
     const { user_id } = req.params;

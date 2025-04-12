@@ -4,75 +4,12 @@ import { useNavigate } from "react-router-dom";
 import styles from '../styles/UniversityPage.module.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
-// Mock data แทนการ fetch จาก API
-
-// เจมจำลองข้อมูลไว้ใช้ พอไม่ใช่ คอมเม้นทิ้งไว้
-// const mockUniversities = [
-//   {
-//     universityid: 1,
-//     universityname: 'จุฬาลงกรณ์มหาวิทยาลัย',
-//     location: 'กรุงเทพมหานคร',
-//     image: 'https://upload.wikimedia.org/wikipedia/commons/a/aa/Logo_of_Chulalongkorn_University.svg'
-//   },
-//   {
-//     universityid: 2,
-//     universityname: 'มหาวิทยาลัยธรรมศาสตร์',
-//     location: 'กรุงเทพมหานคร',
-//     image: 'https://upload.wikimedia.org/wikipedia/commons/3/32/Emblem_of_Thammasat_University.svg'
-//   },
-//   {
-//     universityid: 3,
-//     universityname: 'มหาวิทยาลัยเกษตรศาสตร์',
-//     location: 'กรุงเทพมหานคร',
-//     image: 'https://upload.wikimedia.org/wikipedia/th/5/51/Logo_ku_th.svg'
-//   },
-//   {
-//     universityid: 4,
-//     universityname: 'มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าธนบุรี',
-//     location: 'กรุงเทพมหานคร',
-//     image: 'https://upload.wikimedia.org/wikipedia/th/7/76/Seal_of_King_Mongkut\'s_University_of_Technology_Thonburi.svg'
-//   },
-//   {
-//     universityid: 5,
-//     universityname: 'มหาวิทยาลัยเทคโนโลยีพระจอมพระนครเหนือ',
-//     location: 'กรุงเทพมหานคร',
-//     image: 'https://upload.wikimedia.org/wikipedia/th/b/be/Seal_of_KMUTNB.svg'
-//   },
-//   {
-//     universityid: 6,
-//     universityname: 'มหาวิทยาลัยเชียงใหม่',
-//     location: 'เชียงใหม่',
-//     image: 'https://upload.wikimedia.org/wikipedia/th/d/db/Chiang_Mai_University.svg'
-//   },
-//   {
-//     universityid: 7,
-//     universityname: 'มหาวิทยาลัยมหิดล',
-//     location: 'กรุงเทพมหานคร',
-//     image: 'https://upload.wikimedia.org/wikipedia/commons/9/9c/Mahidol_U.svg'
-//   },
-//   {
-//     universityid: 8,
-//     universityname: 'สถาบันเทคโนโลยีพระจอมเกล้าลาดกระบัง',
-//     location: 'กรุงเทพมหานคร',
-//     image: 'https://upload.wikimedia.org/wikipedia/th/e/e4/Seal_of_King_Mongkut\'s_Institute_of_Technology_Ladkrabang.svg'
-//   }
-// ];
 
 const UniversityPage = () => {
   const [universities, setUniversities] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
-
-// เจมจำลองข้อมูลไว้ใช้ พอไม่ใช่ คอมเม้นทิ้งไว้
-// ใช้ mock data แทนการเรียก API
-  // useEffect(() => {
-    
-  //   setUniversities(mockUniversities);
-  // }, []);
-
-    
-  // อันเก่าของภพ ภพจะใช้เปิดคอมเม้น
   useEffect(() => {
     const fetchUniversities = async () => {
       try {
