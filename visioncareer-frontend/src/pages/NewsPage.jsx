@@ -5,109 +5,174 @@ import styles from '../styles/NewsPage.module.css';
 
 const NewsPage = () => {
   const [newsList, setNewsList] = useState([]);
+  const [filteredNews, setFilteredNews] = useState([]); // เพิ่ม state นี้
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState(""); // เพิ่ม state นี้
   const navigate = useNavigate();
 
   // Mock data จากข้อมูล TCAS จริงที่คุณให้มา
   const mockNewsData = [
     // กลุ่มประกาศล่าสุด (ธ.ค. 67 - ก.พ. 68)
     {
-      id: 1,
+      newid: 1,
       title: "เฉลยชื่อสอบ A-Level ประจำปี 2568",
-      date: "19 ธ.ค. 68",
+      publishedat: "19 ธ.ค. 68",
       summary: "ประกาศผลสอบ A-Level ปีการศึกษา 2568",
-      imageUrl: "https://www.mytcas.com/news/images/alevel2568-result.jpg",
-      detail: "ประกาศผลสอบ A-Level ประจำปีการศึกษา 2568 สามารถตรวจสอบผลสอบได้ที่เว็บไซต์ mytcas.com ตั้งแต่วันที่ 19 ธันวาคม 2568 เป็นต้นไป"
+      imageUrl: "https://i.mytcas.com/wp-content/uploads/2025/03/20120834/%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%81%E0%B8%B2%E0%B8%A8%E0%B9%80%E0%B8%89%E0%B8%A5%E0%B8%A2%E0%B8%A3%E0%B8%B2%E0%B8%A2%E0%B8%A7%E0%B8%B4%E0%B8%8A%E0%B8%B2-61-math1.webp",
+      content: "ประกาศผลสอบ A-Level ประจำปีการศึกษา 2568 สามารถตรวจสอบผลสอบได้ที่เว็บไซต์ mytcas.com ตั้งแต่วันที่ 19 ธันวาคม 2568 เป็นต้นไป"
     },
     {
-      id: 2,
+      newid: 2,
       title: "การบริหารจัดการสิทธิ์ รอบที่ 1 Portfolio",
-      date: "3 ก.พ. 68",
+      publishedat: "3 ก.พ. 68",
       summary: "ประกาศเกี่ยวกับการจัดการสิทธิ์รอบ Portfolio",
       imageUrl: "https://i.mytcas.com/wp-content/uploads/2025/02/03105157/475766928_610253964926881_2012894034497657146_n-1024x1024.webp",
-      detail: "ประกาศการบริหารจัดการสิทธิ์สำหรับผู้สมัครในรอบที่ 1 Portfolio ปีการศึกษา 2568"
+      content: "ประกาศการบริหารจัดการสิทธิ์สำหรับผู้สมัครในรอบที่ 1 Portfolio ปีการศึกษา 2568"
     },
     {
-      id: 3,
-      title: "สำหรับผู้สมัครสนามสอบจังหวัดปัตถานีและสงขลา",
-      date: "6 ธ.ค. 67",
+      newid: 3,
+      title: "สำหรับผู้สมัครสนามสอบจังหวัดปัตตานี และจังหวัดสงขลาที่แจ้งความประสงค์ขอย้ายวันสอบสำเร็จ",
+      publishedat: "6 ธ.ค. 67",
       summary: "แจ้งความประสงค์ของวัฒนธรรมสำเร็จ",
-      imageUrl: "https://www.mytcas.com/news/images/southern-exam.jpg",
-      detail: "ประกาศสำหรับผู้สมัครสอบในจังหวัดปัตถานีและสงขลาเกี่ยวกับการแจ้งความประสงค์ทางวัฒนธรรม"
+      imageUrl: "https://i.mytcas.com/wp-content/uploads/2024/12/06215458/469254774_571015102184101_6473526990199603122_n-1024x1024.webp",
+      content: "ประกาศสำหรับผู้สมัครสอบในจังหวัดปัตถานีและสงขลาเกี่ยวกับการแจ้งความประสงค์ทางวัฒนธรรม"
     },
     {
-      id: 4,
-      title: "ศูนย์สอบมหาวิทยาลัยอุบลราชธานี แจ้งเข้าออกห้องสอบ",
-      date: "6 ธ.ค. 67",
-      summary: "แจ้งรายละเอียดการเข้าห้องสอบ TPAT2 และ TPAT5",
-      imageUrl: "https://www.mytcas.com/news/images/ubon-exam-center.jpg",
-      detail: "ศูนย์สอบมหาวิทยาลัยอุบลราชธานี แจ้งกำหนดการเข้าออกห้องสอบสำหรับวิชา TPAT2 และ TPAT5 ในวันที่ 7 ธันวาคม 2567"
+      newid: 4,
+      title: "ศูนย์สอบมหาวิทยาลัยอุบลราชธานี แจ้งย้ายสถานที่สอบ TPAT2 และ TPAT5 ในวันที่ 7 ธันวาคม 2567",
+      publishedat: "6 ธ.ค. 67"
     },
     {
-      id: 5,
-      title: "อย่าลืม!!! เอกสารสำคัญในการสอบ",
-      date: "5 ธ.ค. 67",
-      summary: "ประกาศเตือนเกี่ยวกับเอกสารที่ต้องนำเข้าห้องสอบ",
-      imageUrl: "https://www.mytcas.com/news/images/exam-documents.jpg",
-      detail: "ประกาศเตือนผู้สมัครสอบเกี่ยวกับเอกสารสำคัญที่ต้องนำมาในวันสอบ ได้แก่ บัตรประชาชน และบัตรเข้าสอบ"
+      newid: 5,
+      title: "อย่าลืม!! เอกสารสำคัญในการสอบ",
+      publishedat: "5 ธ.ค. 67"
     },
     {
-      id: 6,
-      title: "สรุปข้อมูลผู้สมัครสอบที่ได้รับผลกระทบจากน้ำท่วมภาคใต้",
-      date: "5 ธ.ค. 67",
-      summary: "ประกาศสำหรับผู้สมัครสอบในพื้นที่ประสบภัยน้ำท่วม",
-      imageUrl: "https://www.mytcas.com/news/images/flood-announcement.jpg",
-      detail: "สรุปข้อมูลผู้สมัครสอบ TGAT/TPAT2-5 ที่ได้รับผลกระทบจากสถานการณ์น้ำท่วมภาคใต้ ณ วันที่ 5 ธันวาคม 2567"
+      newid: 6,
+      title: "สรุปข้อมูลผู้สมัครสอบ TGAT/TPAT2-5 ที่ได้รับผลกระทบจากสถานการณ์น้ำท่วมภาคใต้ (ข้อมูล ณ วันที่ 5 ธันวาคม 2567)",
+      publishedat: "5 ธ.ค. 67"
     },
     {
-      id: 7,
-      title: "พร้อมแล้ว!! รับสมัครสอบ A-Level",
-      date: "2 ก.พ. 67",
-      summary: "เปิดรับสมัครสอบ A-Level วันที่ 1-10 กุมภาพันธ์ 2567",
-      imageUrl: "https://www.mytcas.com/news/images/alevel-registration.jpg",
-      detail: "ประกาศรับสมัครสอบ A-Level ประจำปีการศึกษา 2567 ระหว่างวันที่ 1-10 กุมภาพันธ์ 2567"
+      newid: 7,
+      title: "ประกาศ เรื่อง การทบทวนข้อร้องเรียนเพื่อเลื่อนสอบรายวิชา TGAT และ TPAT2-5 จากสถานการณ์น้ำท่วมภาคใต้ตอนล่าง ประกาศ ณ วันที่ 5 ธันวาคม 2567",
+      publishedat: "5 ธ.ค. 67"
     },
     {
-      id: 8,
-      title: "การแก้ไขผลสอบรายวิชา TGAT ส่วนที่ 3",
-      date: "15 ม.ค. 67",
-      summary: "ประกาศเกี่ยวกับการแก้ไขผลสอบ TGAT3",
-      imageUrl: "https://www.mytcas.com/news/images/tgat-correction.jpg",
-      detail: "ประกาศเรื่องการแก้ไขผลลัพธ์การสอบรายวิชา TGAT ส่วนที่ 3 สำหรับผู้สมัครที่พบปัญหา"
+      newid: 8,
+      title: "ข้อปฏิบัติในการเข้าสอบ!!",
+      publishedat: "5 ธ.ค. 67"
     },
     {
-      id: 9,
-      title: "บทลงโทษการกระทำผิดกฎระเบียบการสอบ",
-      date: "9 ธ.ค. 66",
-      summary: "ประกาศบทลงโทษสำหรับผู้กระทำผิดกฎระเบียบการสอบ",
-      imageUrl: "https://www.mytcas.com/news/images/exam-rules.jpg",
-      detail: "ประกาศเรื่องบทลงโทษการกระทำการฝ่าฝืนกฎระเบียบการสอบในวิชา TGAT, TPAT และ A-Level ปีการศึกษา 2567"
+      newid: 9,
+      title: "รายงานการติดตามสถานการณ์ในพื้นที่จังหวัดภาคใต้ตอนล่าง ประกาศ ณ วันที่ 4 ธันวาคม 2567 เวลา 21.00น.",
+      publishedat: "4 ธ.ค. 67"
     },
     {
-      id: 10,
-      title: "การจัดสนามสอบ TGAT/TPAT2-5 และ A-Level",
-      date: "ก.ค. 66",
-      summary: "ประกาศเกี่ยวกับการจัดสนามสอบรูปแบบใหม่",
-      imageUrl: "https://www.mytcas.com/news/images/exam-venue.jpg",
-      detail: "ประกาศเรื่องการจัดสนามสอบสำหรับ TGAT/TPAT2-5 และ A-Level ในปีการศึกษา 2567"
+      newid: 10,
+      title: "เตรียมพร้อม!! อุปกรณ์สามารถนำเข้าห้องสอบได้",
+      publishedat: "3 ธ.ค. 67"
     },
     {
-      id: 11,
-      title: "พร้อมแล้ว!! รับสมัครสอบ TGAT/TPAT2-5",
-      date: "ก.ค. 66",
-      summary: "เปิดรับสมัครสอบ TGAT/TPAT2-5",
-      imageUrl: "https://www.mytcas.com/news/images/tgat-registration.jpg",
-      detail: "ประกาศรับสมัครสอบ TGAT/TPAT2-5 ประจำปีการศึกษา 2567"
+      newid: 11,
+      title: "รายงานการติดตามสถานการณ์ในพื้นที่จังหวัดภาคใต้ตอนล่างประกาศ ณ วันที่ 3 ธันวาคม 2567 เวลา 20.00 น.",
+      publishedat: "3 ธ.ค. 67"
     },
     {
-      id: 12,
-      title: "ปฏิทินการสอบ TGAT/TPAT และ A-Level",
-      date: "ก.ค. 66",
-      summary: "อัปเดตปฏิทินการสอบปีการศึกษา 2567",
-      imageUrl: "https://www.mytcas.com/news/images/exam-calendar.jpg",
-      detail: "ประกาศปฏิทินการสอบ TGAT/TPAT และอัปเดตปฏิทินการสอบ A-Level ปีการศึกษา 2567"
+      newid: 12,
+      title: "คู่มือการลงทะเบียนย้ายวันสอบ สำหรับผู้สมัครในสนามสอบจังหวัดปัตตานี และจังหวัดสงขลา ที่อาจประสบปัญหาในการเดินทางมาเข้าสอบในวันที่ 7-9 ธันวาคม 2567",
+      publishedat: "3 ธ.ค. 67"
+    },
+    {
+      newid: 13,
+      title: "สามารถนำอะไรเข้าห้องสอบได้บ้าง?",
+      publishedat: "3 ธ.ค. 67"
+    },
+    {
+      newid: 14,
+      title: "ประกาศ การลงทะเบียนเลื่อนสอบ TGAT/TPAT2-5 ในพื้นที่จังหวัดภาคใต้ตอนล่าง",
+      publishedat: "2 ธ.ค. 67"
+    },
+    {
+      newid: 15,
+      title: "รายงานการติดตามสถานการณ์ในพื้นที่จังหวัดภาคใต้ตอนล่างประกาศ ณ วันที่ 2 ธันวาคม 2567 เวลา 20.00 น.",
+      publishedat: "2 ธ.ค. 67"
+    },
+    {
+      newid: 16,
+      title: "จะสอบ TGAT/TPAT ต้องเตรียมตัวอย่างไร?",
+      publishedat: "1 ธ.ค. 67"
+    },
+    {
+      newid: 17,
+      title: "รายงานการติดตามสถานการณ์ในพื้นที่จังหวัดภาคใต้ตอนล่างประกาศ ณ วันที่ 1 ธันวาคม 2567 เวลา 17.00 น.",
+      publishedat: "1 ธ.ค. 67"
+    },
+    {
+      newid: 18,
+      title: "ประกาศชี้แจงการสอบ TGAT/TPAT2-5 ในพื้นที่จังหวัดภาคใต้ตอนล่าง",
+      publishedat: "1 ธ.ค. 67"
+    },
+    {
+      newid: 19,
+      title: "เรื่อง บทลงโทษการกระทำทุจริตการจัดการทดสอบรายวิชาความถนัดทั่วไป (TGAT) และรายวิชาความถนัดทางวิชาการและวิชาชีพ (TPAT) และรายวิชา A-Level ปีการศึกษา 2568",
+      publishedat: "28 พ.ย. 67"
+    },
+    {
+      newid: 20,
+      title: "เนื่องจากสถานการณ์น้ำท่วมภาคใต้ ทำให้ศูนย์สอบมหาวิทยาลัยสงขลานครินทร์งดการทดลองสอบ TGAT/TPAT ด้วย เครื่องคอมพิวเตอร์ (CBT)ในวันเสาร์ที่ 30 พฤศจิกายน 2567",
+      publishedat: "27 ส.ค. 67"
+    },
+    {
+      newid: 21,
+      title: "ประกาศสมาคมที่ประชุมอธิการบดีแห่งประเทศไทย ฉบับที่ 11 ว่าด้วยแนวทางปฏิบัติเกี่ยวกับการดำเนินการทดสอบ พ.ศ. 2568 เพื่อใช้ในระบบการจัดการทดสอบรายวิชาข้อสอบกลางที่ใช้ในการคัดเลือกกลางบุคคลเข้าศึกษา ในสถาบันอุดมศึกษา ปีการศึกษา 2568",
+      publishedat: "18 เม.ย. 67"
+    },
+    {
+      newid: 22,
+      title: "คำชี้แจง ทปอ. ตอบข้อสงสัยเรื่องการประกาศผลคะแนน A-Level 67",
+      publishedat: "1 มี.ค. 67"
+    },
+    {
+      newid: 23,
+      title: "การแต่งกายไปสอบ TGAT/TPAT 2-5 และ A-Level",
+      publishedat: "29 ก.พ. 67"
+    },
+    {
+      newid: 24,
+      title: "อย่าลืม!! บัตรประจำตัวผู้เข้าสอบรายวิชาและบัตรประจำตัวประชาชน",
+      publishedat: "10 ก.พ. 67"
+    },
+    {
+      newid: 25,
+      title: "วันสุดท้าย!! รับสมัคร/ชำระเงิน A-Level",
+      publishedat: "7 ก.พ. 67"
+    },
+    {
+      newid: 26,
+      title: "ยืนยันสิทธิ์ รอบ 1 (Portfolio) วันนี้ปิดระบบ 23.59 น.",
+      publishedat: "5 ก.พ. 67"
+    },
+    {
+      newid: 27,
+      title: "ประกาศผลการคัดเลือกรอบที่ 1 Portfolio และเปิดระบบบริหารจัดการสิทธิ์ วันที่ 6 ก.พ. 2567 เวลา 9:00 น.",
+      publishedat: "4 ก.พ. 67"
+    },
+    {
+      newid: 28,
+      title: "อย่าลืม!! สมัครสอบ A-Level เพื่อใช้ในการสมัครเรียนต่อ มหาวิทยาลัยมหาสารคาม",
+      publishedat: "2 ก.พ. 67"
+    },
+    {
+      newid: 29,
+      title: "การชำระเงินค่าสมัคร A-Level วันที่ 1-10 กุมภาพันธ์ 2567",
+      publishedat: "2 ก.พ. 67"
+    },
+    {
+      newid: 30,
+      title: "พร้อมแล้ว!! รับสมัครสอบ A-Level เริ่มตั้งแต่วันที่ 1-10 กุมภาพันธ์ 2567",
+      publishedat: "15 ม.ค. 67"
     }
   ];
 
@@ -119,9 +184,10 @@ const NewsPage = () => {
       try {
         // เรียงลำดับข่าวจากวันที่ล่าสุดไปเก่าสุด
         const sortedNews = [...mockNewsData].sort((a, b) => {
-          return new Date(b.date) - new Date(a.date);
+          return new Date(b.publishedat) - new Date(a.publishedat);
         });
         setNewsList(sortedNews);
+        setFilteredNews(sortedNews); // ตั้งค่า filteredNews ด้วย
         setLoading(false);
       } catch (err) {
         setError("ไม่สามารถโหลดข้อมูลข่าวสารได้");
@@ -133,18 +199,36 @@ const NewsPage = () => {
     fetchNews();
   }, []);
 
+    // เพิ่ม useEffect สำหรับการค้นหา
+    useEffect(() => {
+      if (searchTerm.trim() === "") {
+        setFilteredNews(newsList);
+      } else {
+        const filtered = newsList.filter(news =>
+          news.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (news.summary && news.summary.toLowerCase().includes(searchTerm.toLowerCase()))
+        );
+        setFilteredNews(filtered);
+      }
+      setCurrentPage(1); // รีเซ็ตไปหน้าแรกเมื่อค้นหา
+    }, [searchTerm, newsList]);
+
   const handleNewsClick = (newsItem) => {
-    navigate(`/news/${newsItem.id}`, { state: { news: newsItem } });
+    navigate(`/news/${newsItem.newid}`, { state: { news: newsItem } });
   };
 
-  // คำนวณหน้าทั้งหมด
-  const totalPages = Math.ceil(newsList.length / itemsPerPage);
-
-  // ดึงข้อมูลสำหรับหน้าปัจจุบัน
-  const currentNews = newsList.slice(
+  // เปลี่ยนจาก newsList เป็น filteredNews ในส่วนนี้
+  const totalPages = Math.ceil(filteredNews.length / itemsPerPage);
+  const currentNews = filteredNews.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  // ดึงข้อมูลสำหรับหน้าปัจจุบัน
+  // const currentNews = newsList.slice(
+  //   (currentPage - 1) * itemsPerPage,
+  //   currentPage * itemsPerPage
+  // );
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -177,18 +261,21 @@ const NewsPage = () => {
         <div className={styles.header}>
           <h1 className={styles.title}>ข่าวสาร ประกาศจากกปอ. และสถาบันต่าง ๆ</h1>
           <div className={styles.filterBar}>
-            <input
-              type="text"
-              placeholder="ค้นหาข่าวสาร..."
-              className={styles.searchInput}
-            />
+          
+          <input
+            type="text"
+            placeholder="ค้นหาข่าวสาร"
+            className={styles.searchInput}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
           </div>
         </div>
 
         <div className={styles.content}>
           {currentNews.map((news) => (
             <div 
-              key={news.id} 
+              key={news.newid} 
               className={styles.card}
               onClick={() => handleNewsClick(news)}
               role="button"
@@ -209,7 +296,7 @@ const NewsPage = () => {
                 }}
               />
               <div className={styles.details}>
-                <div className={styles.dateBadge}>{news.date}</div>
+                <div className={styles.dateBadge}>{news.publishedat}</div>
                 <h2 className={styles.newsTitle}>{news.title}</h2>
                 <p className={styles.newsSummary}>{news.summary}</p>
                 <button 

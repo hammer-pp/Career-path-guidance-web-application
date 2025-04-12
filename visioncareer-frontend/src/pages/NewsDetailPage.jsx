@@ -14,33 +14,37 @@ const NewsDetailPage = () => {
   }
 
   return (
-    <div className={styles.container}>
-      <button onClick={() => navigate(-1)} className={styles.backButton}>
-        ย้อนกลับ
-      </button>
-
-      <div className={styles.newsDetail}>
-        <h1 className={styles.newsTitle}>{news.title}</h1>
-        <div className={styles.newsMeta}>
-          <span className={styles.newsDate}>เผยแพร่เมื่อ: {news.date}</span>
+    <div className={styles.background}>
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <button onClick={() => navigate(-1)} className={styles.backButton}>
+            ย้อนกลับ
+          </button>
+          <h1 className={styles.newsTitle}>{news.title}</h1>
         </div>
-        
-        {news.imageUrl && (
-          <div className={styles.newsImageContainer}>
-            <img 
-              src={news.imageUrl} 
-              alt={news.title} 
-              className={styles.newsImage}
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = 'https://via.placeholder.com/800x400?text=No+Image';
-              }}
-            />
-          </div>
-        )}
 
-        <div className={styles.newsContent}>
-          <p>{news.detail}</p>
+        <div className={styles.newsDetail}>
+          <div className={styles.newsMeta}>
+            <span className={styles.newsDate}>เผยแพร่เมื่อ: {news.publishedat}</span>
+          </div>
+          
+          {news.imageUrl && (
+            <div className={styles.newsImageContainer}>
+              <img 
+                src={news.imageUrl} 
+                alt={news.title} 
+                className={styles.newsImage}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = 'https://via.placeholder.com/800x400?text=No+Image';
+                }}
+              />
+            </div>
+          )}
+
+          <div className={styles.newsContent}>
+            <p>{news.content}</p>
+          </div>
         </div>
       </div>
     </div>
