@@ -275,26 +275,22 @@ app.get("/recommendations/:user_id", async (req, res) => {
   }
 });
 
-const parseImageUrls = (val) => {
-  try {
-    const parsed = JSON.parse(val || "[]");
-    if (Array.isArray(parsed)) return parsed;
-    if (typeof parsed === "string") return [parsed]; // กรณี string เดี่ยว
-    return [];
-  } catch {
-    return typeof val === "string" ? [val] : [];
-  }
-};
-
 app.get("/news", async (req, res) => {
   try {
     const news = await db("news").orderBy("publishedat", "desc");
-    const withParsed = news.map(n => ({
+    const withParsedImages = news.map(n => ({
       ...n,
-      imageurls: parseImageUrls(n.imageurls)
+      imageurls: (() => {
+        try {
+          return JSON.parse(n.imageurls || "[]");
+        } catch {
+          return [];
+        }
+      })()
     }));
-    res.json(withParsed);
-  } catch (err) {
+    res.json(withParsedImages);
+  } catch (error) {
+    console.error("❌ Error fetching news:", error);
     res.status(500).json({ error: "Failed to fetch news" });
   }
 });
