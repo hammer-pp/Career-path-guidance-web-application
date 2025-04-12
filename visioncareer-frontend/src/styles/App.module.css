@@ -40,6 +40,11 @@
     justify-content: center;
   }
   
+  .navLink:hover {
+    background-color: white;
+    color: black; /* สีข้อความเมื่อ hover */
+  }
+
   .activeNavLink {
     background-color: #F4F4F4;
     border-radius: 25px;
