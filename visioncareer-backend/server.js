@@ -275,6 +275,52 @@ app.get("/recommendations/:user_id", async (req, res) => {
   }
 });
 
+const parseImageUrls = (val) => {
+  try {
+    const parsed = JSON.parse(val || "[]");
+    if (Array.isArray(parsed)) return parsed;
+    if (typeof parsed === "string") return [parsed]; // กรณี string เดี่ยว
+    return [];
+  } catch {
+    return typeof val === "string" ? [val] : [];
+  }
+};
+
+app.get("/news", async (req, res) => {
+  try {
+    const news = await db("news").orderBy("publishedat", "desc");
+    const withParsed = news.map(n => ({
+      ...n,
+      imageurls: parseImageUrls(n.imageurls)
+    }));
+    res.json(withParsed);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch news" });
+  }
+});
+
+// ดึงข่าวตาม ID
+app.get("/news/:id", async (req, res) => {
+  try {
+    const news = await db("news").where("newsid", req.params.id).first();
+    if (!news) return res.status(404).json({ error: "ไม่พบข่าว" });
+
+    const parsedImageUrls = (() => {
+      try {
+        return JSON.parse(news.imageurls || "[]");
+      } catch (e) {
+        console.warn("⚠️ imageurls parse fail", e);
+        return [];
+      }
+    })();
+
+    res.json({ ...news, imageurls: parsedImageUrls });
+  } catch (err) {
+    console.error("❌ Failed to fetch news by id:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 // ตั้งค่าพอร์ต
 const PORT = process.env.PORT || 5000;
 app.listen(5000, "0.0.0.0", () => {
