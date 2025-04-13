@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     localStorage.removeItem("user");
     localStorage.removeItem("token");
-    window.location.href = "/login";  // ✅ ใช้ window.location แทน useNavigate()
+    window.location.href = "/";  // ✅ ใช้ window.location แทน useNavigate()
   };
 
   return (
