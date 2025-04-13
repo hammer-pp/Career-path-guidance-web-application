@@ -1,4 +1,29 @@
 require("dotenv").config(); // โหลดค่าตัวแปรจากไฟล์ .env
+
+const fs = require("fs");
+const csv = require("csv-parser");
+const path = require("path");
+const MAPPING_FILE = path.join(__dirname, "holland_big5_to_career_mapping_final.csv");
+
+function getMappedCareers(holland_group, big5_group) {
+  return new Promise((resolve, reject) => {
+    const matches = [];
+    fs.createReadStream(MAPPING_FILE)
+      .pipe(csv())
+      .on("data", (row) => {
+        if (
+          parseInt(row.holland_group) === holland_group &&
+          parseInt(row.big5_group) === big5_group
+        ) {
+          const ids = row.career_ids.replace(/\[|\]|\s/g, "").split(",").map(Number);
+          matches.push(...ids);
+        }
+      })
+      .on("end", () => resolve(matches))
+      .on("error", (err) => reject(err));
+  });
+}
+
 const express = require("express");
 const db = require("./db"); // เชื่อมต่อฐานข้อมูลจากไฟล์ db.js
 const bcrypt = require("bcryptjs");
@@ -46,14 +71,14 @@ app.post("/users", async (req, res) => {
   }
 
   // ตรวจสอบว่ามีอีเมลนี้ในระบบหรือยัง
-  const existingUser = await db("Users").where({ email }).first();
+  const existingUser = await db("users").where({ email }).first();
   if (existingUser) {
     return res.status(400).json({ error: "Email already exists" });
   }
 
   // เข้ารหัสรหัสผ่านก่อนบันทึก
   const hashedPassword = await bcrypt.hash(password, 10);
-  const newUser = await db("Users").insert({
+  const newUser = await db("users").insert({
     fullname,
     email,
     password: hashedPassword,
@@ -63,38 +88,47 @@ app.post("/users", async (req, res) => {
   res.status(201).json({ message: "User registered successfully" });
 });
 
-  // ดึงข้อมูลผู้ใช้ตาม ID
+// ดึงข้อมูลผู้ใช้ทั้งหมด
 app.get("/users/:id", async (req, res) => {
+  const { id } = req.params;
   try {
-    const { id } = req.params;
-    const user = await db("users").where("userid", id).first();
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
+    const user = await db("users").where({ userid: id }).first();
+    if (!user) return res.status(404).json({ error: "User not found" });
     res.json(user);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  } catch (err) {
+    console.error("❌ ดึงข้อมูลผู้ใช้ไม่สำเร็จ:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
-// อัปเดตข้อมูลผู้ใช้
 app.put("/users/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { fullname, email, password } = req.body;
-    
-    const updatedUser = await db("users")
-      .where("userid", id)
-      .update({ fullname, email, password })
-      .returning(["userid", "fullname", "email"]);
+  const { id } = req.params;
+  let { fullname, email, password, phonenumber, dateofbirth, gender } = req.body;
 
-    if (!updatedUser.length) {
-      return res.status(404).json({ error: "User not found" });
+  try {
+    // ✅ ถ้าใส่ password → เข้ารหัสก่อน
+    if (password && password.trim() !== "") {
+      const salt = await bcrypt.genSalt(10);
+      password = await bcrypt.hash(password, salt);
+    } else {
+      password = undefined; // ไม่อัปเดตรหัสผ่านถ้าไม่ได้ใส่มา
     }
 
-    res.json(updatedUser[0]);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+    const updateData = {
+      fullname,
+      email,
+      phonenumber,
+      dateofbirth,
+      gender
+    };
+
+    if (password) updateData.password = password;
+
+    await db("users").where({ userid: id }).update(updateData);
+    res.json({ message: "✅ อัปเดตสำเร็จ" });
+  } catch (err) {
+    console.error("❌ อัปเดตผู้ใช้ไม่สำเร็จ:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -150,43 +184,140 @@ app.post("/save-test", async (req, res) => {
   }
 });
 
+
 app.post("/results", async (req, res) => {
   const { user_id, holland_group, big5_group } = req.body;
 
-  if (!user_id || !holland_group || !big5_group) {
+  if (!user_id || holland_group === undefined || big5_group === undefined) {
     return res.status(400).json({ error: "Missing required prediction data." });
   }
 
   try {
-    // ✅ ตรวจสอบ testid ล่าสุดของผู้ใช้
     const latestTest = await db("tests")
       .where("userid", user_id)
       .orderBy("createdat", "desc")
       .first();
 
-    const testid = latestTest ? latestTest.testid : null;
-
-    if (!testid) {
+    if (!latestTest) {
       return res.status(400).json({ error: "No test record found to associate recommendation." });
     }
 
-    // ✅ ค้นหา majorcareerid ที่เหมาะสมกับ group (เช่น mock data หรือ mapping ภายหลัง)
-    const careerid = holland_group; // เปลี่ยนให้ตรงกับ logic จริงของคุณ
+    const testid = latestTest.testid;
 
-    const newRecommendation = await db("recommendations").insert({
-      userid: user_id,
-      testid: testid,
-      careerid: careerid, // สมมุติว่าใช้ Holland อย่างเดียวก่อน
-      createdat: new Date()
-    });
+    // ✅ อัปเดตกลุ่มลงตาราง tests
+    await db("tests")
+      .where("testid", testid)
+      .update({ holland_group, big5_group });
 
-    res.status(200).json({ message: "Prediction result saved", recommendationid: newRecommendation[0] });
+    // ✅ ดึง career_ids จาก mapping CSV
+    const career_ids = await getMappedCareers(holland_group, big5_group);
+
+    // ✅ กรองเฉพาะอาชีพที่มีใน major_career
+    const validCareerIds = await db("major_career").distinct("careerid").pluck("careerid");
+    const filteredCareerIds = career_ids.filter(cid => validCareerIds.includes(cid));
+
+    if (filteredCareerIds.length === 0) {
+      return res.status(404).json({ error: "ไม่พบอาชีพที่เชื่อมโยงกับกลุ่มนี้ในฐานข้อมูล" });
+    }
+
+    // ✅ ลบรายการเก่าของ testid นี้ (กัน insert ซ้ำ)
+    await db("recommendations").where("testid", testid).del();
+
+    // ✅ เพิ่มรายการใหม่
+    const now = new Date();
+    await db("recommendations").insert(
+      filteredCareerIds.map(cid => ({
+        userid: user_id,
+        testid,
+        careerid: cid,
+        createdat: now
+      }))
+    );
+
+    res.status(200).json({ message: "Prediction result saved", career_ids: filteredCareerIds });
   } catch (err) {
     console.error("❌ Failed to save prediction result:", err);
     res.status(500).json({ error: "Server error while saving prediction result" });
   }
 });
 
+// ✅ 1. ดึงอาชีพที่ระบบแนะนำให้ user
+// ✅ แสดงอาชีพจาก test ล่าสุด
+app.get("/user/:user_id/recommended-careers", async (req, res) => {
+  const { user_id } = req.params;
+
+  try {
+    const latestTest = await db("tests")
+      .where("userid", user_id)
+      .orderBy("createdat", "desc")
+      .first();
+
+    if (!latestTest) {
+      return res.status(404).json({ error: "ไม่พบแบบทดสอบล่าสุดของผู้ใช้" });
+    }
+
+    const careers = await db("recommendations as r")
+      .join("careers as c", "r.careerid", "=", "c.careerid")
+      .where("r.userid", user_id)
+      .andWhere("r.testid", latestTest.testid)
+      .distinct("c.careerid", "c.careername", "c.description");
+
+    res.json({ user_id, testid: latestTest.testid, careers });
+  } catch (error) {
+    console.error("❌ Error fetching recommended careers:", error);
+    res.status(500).json({ error: "Failed to fetch recommended careers" });
+  }
+});
+
+// ✅ 2. ดึงสาขาที่เชื่อมกับอาชีพ
+app.get("/careers/:career_id/majors", async (req, res) => {
+  const { career_id } = req.params;
+
+  try {
+    const majors = await db("major_career as mc")
+      .join("majors as m", "mc.majorid", "=", "m.majorid")
+      .where("mc.careerid", career_id)
+      .select("m.majorid", "m.majorname", "m.description");
+
+    res.json({ career_id, majors });
+  } catch (error) {
+    console.error("❌ Error fetching majors for career:", error);
+    res.status(500).json({ error: "Failed to fetch majors for career" });
+  }
+});
+
+// ✅ 3. ดึงข้อมูลสาขา + คณะ + มหาวิทยาลัย
+app.get("/majors/:major_id/detail", async (req, res) => {
+  const { major_id } = req.params;
+
+  try {
+    const majorInfo = await db("majors").where("majorid", major_id).first();
+
+    if (!majorInfo) {
+      return res.status(404).json({ error: "ไม่พบข้อมูลสาขานี้" });
+    }
+
+    const facultyInfo = await db("faculty_major as fm")
+      .join("faculties as f", "fm.facultyid", "=", "f.facultyid")
+      .where("fm.majorid", major_id)
+      .select("f.facultyid", "f.facultyname")
+      .first();
+
+    const universities = await db("university_major as um")
+      .join("universities as u", "um.universityid", "=", "u.universityid")
+      .where("um.majorid", major_id)
+      .select("u.universityid", "u.universityname", "u.location");
+
+    res.json({
+      ...majorInfo,
+      faculty: facultyInfo || null,
+      universities
+    });
+  } catch (error) {
+    console.error("❌ Error fetching major detail:", error);
+    res.status(500).json({ error: "Failed to fetch major detail" });
+  }
+});
 
 app.get("/universities", async (req, res) => {
   try {
@@ -321,4 +452,40 @@ app.get("/news/:id", async (req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(5000, "0.0.0.0", () => {
   console.log("Server running on port 5000");
+});
+
+
+// ✅ แสดงประวัติการแนะนำอาชีพทั้งหมดของผู้ใช้
+app.get("/user/:user_id/recommendation-history", async (req, res) => {
+  const { user_id } = req.params;
+
+  try {
+    const results = await db("recommendations as r")
+      .join("careers as c", "r.careerid", "=", "c.careerid")
+      .join("tests as t", "r.testid", "=", "t.testid")
+      .where("r.userid", user_id)
+      .orderBy("t.createdat", "desc")
+      .select("r.testid", "t.createdat", "c.careerid", "c.careername", "c.description");
+
+    // แยกผลลัพธ์ตาม testid
+    const history = {};
+    for (const row of results) {
+      if (!history[row.testid]) {
+        history[row.testid] = {
+          createdat: row.createdat,
+          careers: []
+        };
+      }
+      history[row.testid].careers.push({
+        careerid: row.careerid,
+        careername: row.careername,
+        description: row.description
+      });
+    }
+
+    res.json({ user_id, history });
+  } catch (error) {
+    console.error("❌ Error fetching recommendation history:", error);
+    res.status(500).json({ error: "Failed to fetch recommendation history" });
+  }
 });

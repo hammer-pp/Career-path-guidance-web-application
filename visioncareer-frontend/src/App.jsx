@@ -15,7 +15,10 @@ import './App.css';
 import Logo from './assets/Logo.png';
 import { Button,Avatar } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
-import styles from './styles/App.module.css'; // นำเข้าไฟล์ CSS Modules
+import styles from './styles/App.module.css';
+import ProfilePage from './pages/ProfilePage';
+import HistoryPage from './pages/HistoryPage';
+import UserMenu from './components/UserMenu'; // นำเข้าไฟล์ CSS Modules
 
 const App = () => {
   return (
@@ -73,12 +76,7 @@ const AppContent = () => {
 
           <div style={{ marginLeft: "auto", display: "flex", gap: "10px" }}>
             {user ? (
-              <div className={styles.userInfo}>
-                <span className={styles.username}>{user.fullname}</span>
-                {/* <span style={{ fontSize: "16px", fontWeight: "bold" }}>สวัสดี, {user.fullname}</span> */}
-                <Avatar size="large" icon={<UserOutlined />} className={styles.avatar} onClick={logout} />
-                {/* <Button type="primary" className={styles.logoutButton} onClick={logout}> ออกจากระบบ</Button> */}
-                </div>
+              <UserMenu user={user} onLogout={logout} />
             ) : (
               <>
                 <Link to="/login" style={{ textDecoration: "none" }}>
@@ -105,6 +103,8 @@ const AppContent = () => {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/university/:id" element={<UniversityDetailPage />} />
         <Route path="/university/:id/faculty/:facultyId" element={<FacultyDetailPage />} />
+        <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
+        <Route path="/history" element={<PrivateRoute><HistoryPage /></PrivateRoute>} />
       </Routes>
     </div>
   );

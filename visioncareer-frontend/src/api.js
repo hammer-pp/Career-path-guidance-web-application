@@ -1,4 +1,5 @@
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL;
+const FLASK_URL = import.meta.env.VITE_FLASK_URL;
 
 // ✅ ฟังก์ชันล็อกอิน
 export const loginUser = async (email, password) => {
@@ -41,6 +42,30 @@ export async function registerUser(fullname, email, password) {
   } catch (error) {
     console.error("⚠️ Registration failed:", error);
     throw error;
+  }
+}
+
+// ✅ ฟังก์ชันทำนายจากแบบทดสอบ
+export async function predictAnswers(answers, user_id) {
+  try {
+    const response = await fetch(`${FLASK_URL}/predict`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ answers, user_id })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Prediction failed");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (err) {
+    console.error("❌ Failed to fetch prediction:", err);
+    throw err;
   }
 }
 

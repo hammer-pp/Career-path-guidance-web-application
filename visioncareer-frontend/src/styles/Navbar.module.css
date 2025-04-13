@@ -1,0 +1,33 @@
+
+.userMenuWrapper {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+}
+
+.username {
+  font-weight: bold;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  box-shadow: 0px 2px 8px rgba(0,0,0,0.15);
+  z-index: 1000;
+  border-radius: 4px;
+  overflow: hidden;
+  min-width: 180px;
+}
+
+.dropdownMenu > div {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.dropdownMenu > div:hover {
+  background-color: #f5f5f5;
+}

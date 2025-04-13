@@ -1,0 +1,49 @@
+holland_group,holland_type,big5_group,big5_type,career_ids
+0,Realistic,2,Conscientiousness,"[7, 8, 36]"
+0,Realistic,3,Emotional Stability,"[4, 5]"
+1,Investigative,4,Openness,"[2, 3, 31]"
+1,Investigative,1,Agreeableness,"[34, 43]"
+2,Artistic,4,Openness,"[29, 26, 40]"
+2,Artistic,0,Extraversion,"[25, 46]"
+3,Social,6,Empathy,"[17, 38, 19]"
+3,Social,1,Agreeableness,"[20, 39, 33]"
+4,Enterprising,0,Extraversion,"[12, 13, 14]"
+4,Enterprising,7,Assertiveness,[30]
+5,Conventional,2,Conscientiousness,"[9, 10, 11]"
+5,Conventional,3,Emotional Stability,[42]
+0,Realistic,0,Extraversion,[40]
+0,Realistic,1,Agreeableness,[26]
+0,Realistic,4,Openness,[27]
+0,Realistic,5,Discipline,[45]
+0,Realistic,6,Empathy,[36]
+0,Realistic,7,Assertiveness,[43]
+1,Investigative,0,Extraversion,[5]
+1,Investigative,2,Conscientiousness,[13]
+1,Investigative,3,Emotional Stability,[9]
+1,Investigative,5,Discipline,[4]
+1,Investigative,6,Empathy,[7]
+1,Investigative,7,Assertiveness,[25]
+2,Artistic,1,Agreeableness,[33]
+2,Artistic,2,Conscientiousness,[20]
+2,Artistic,3,Emotional Stability,[18]
+2,Artistic,5,Discipline,[14]
+2,Artistic,6,Empathy,[44]
+2,Artistic,7,Assertiveness,[16]
+3,Social,0,Extraversion,[10]
+3,Social,2,Conscientiousness,[17]
+3,Social,3,Emotional Stability,[38]
+3,Social,4,Openness,[32]
+3,Social,5,Discipline,[28]
+3,Social,7,Assertiveness,[1]
+4,Enterprising,1,Agreeableness,[31]
+4,Enterprising,2,Conscientiousness,[30]
+4,Enterprising,3,Emotional Stability,[6]
+4,Enterprising,4,Openness,[12]
+4,Enterprising,5,Discipline,[34]
+4,Enterprising,6,Empathy,[2]
+5,Conventional,0,Extraversion,[42]
+5,Conventional,1,Agreeableness,[22]
+5,Conventional,4,Openness,[3]
+5,Conventional,5,Discipline,[35]
+5,Conventional,6,Empathy,[24]
+5,Conventional,7,Assertiveness,[37]

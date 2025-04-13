@@ -1,31 +1,15 @@
 import { Button, Steps } from 'antd';
-// import '../styles/TestPage.css'; // นำเข้าไฟล์ CSS
-import styles from '../styles/TestPage.module.css'; // นำเข้าไฟล์ CSS Modules
+import styles from '../styles/TestPage.module.css';
 import { personalityQuestions, interestQuestions } from '../data/questions';
 import AuthContext from "./AuthContext";
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
+import axios from 'axios';
+import { predictAnswers } from "../api";
 
-const API_URL = "http://localhost:5001"; // Flask
-const BACKEND_URL = "http://localhost:5000"; // Node.js
+const FLASK_URL = import.meta.env.VITE_FLASK_URL;
+const API_URL = import.meta.env.VITE_API_URL;
 
 const { Step } = Steps;
-
-//สร้างข้อมูลคำถาม (ความชอบ 48 ข้อ)
-// const interestQuestions = [
-//   { question: "คุณชอบทดสอบคุณภาพชิ้นส่วนอุปกรณ์", options: ["ไม่ชอบอย่างมาก", "ไม่ชอบ", "เฉยๆ", "ชอบ", "ชอบอย่างมาก"] },
-//   { question: "คุณชอบงานก่ออิฐก่อสร้าง", options: ["ไม่ชอบอย่างมาก", "ไม่ชอบ", "เฉยๆ", "ชอบ", "ชอบอย่างมาก"] },
-//   { question: "คุณชอบทำงานบนแท่นขุดเจาะน้ำมันนอกชายฝั่ง", options: ["ไม่ชอบอย่างมาก", "ไม่ชอบ", "เฉยๆ", "ชอบ", "ชอบอย่างมาก"] },
-// ];
-
-
-//คำถามชุดที่ 2 (บุคลิกภาพ) - 33 ข้อ
-// const personalityQuestions = [
-//   { question: "คุณมีชีวิตชีวาในงานปาร์ตี้", options: ["ไม่เห็นด้วยอย่างมาก", "ไม่เห็นด้วย", "เฉยๆ", "เห็นด้วย", "เห็นด้วยอย่างมาก"] },
-//   { question: "คุณไม่ค่อยพูดมาก", options: ["ไม่เห็นด้วยอย่างมาก", "ไม่เห็นด้วย", "เฉยๆ", "เห็นด้วย", "เห็นด้วยอย่างมาก"] },
-//   { question: "คุณรู้สึกสบายใจเมื่ออยู่กับผู้คน", options: ["ไม่เห็นด้วยอย่างมาก", "ไม่เห็นด้วย", "เฉยๆ", "เห็นด้วย", "เห็นด้วยอย่างมาก"] },
-// ];
-
-
 
 const TestPage = () => {
   const { user } = useContext(AuthContext);
@@ -36,7 +20,12 @@ const TestPage = () => {
   const [personalityAnswers, setPersonalityAnswers] = useState({});
   const [interestAnswers, setInterestAnswers] = useState({});
 
-  // ฟังก์ชันต่าง ๆ ที่ใช้ใน component
+  const [careers, setCareers] = useState([]);
+  const [selectedCareerId, setSelectedCareerId] = useState(null);
+  const [selectedCareerName, setSelectedCareerName] = useState("");
+  const [majors, setMajors] = useState([]);
+  const [majorDetail, setMajorDetail] = useState(null);
+
   const startTest = () => setStep(0.5);
   const startTestper = () => setStep(1);
   const startInterestTest = () => {
@@ -59,7 +48,7 @@ const TestPage = () => {
     newAnswers[index] = parseInt(value);
     setAnswers(newAnswers);
   };
-  
+
   const handleSubmit = async () => {
     const combinedAnswers = {
       ...personalityAnswers,
@@ -67,50 +56,41 @@ const TestPage = () => {
         Object.entries(interestAnswers).map(([key, value]) => [parseInt(key) + 33, value])
       ),
     };
-  
     const combinedArray = Array(81).fill(0).map((_, index) => combinedAnswers[index]);
-  
-    console.log("✅ Answers to send:", combinedArray);
-    console.log("✅ Answers length:", combinedArray.length);
-  
+
     if (combinedArray.length !== 81 || combinedArray.includes(undefined)) {
       alert("กรุณาทำแบบทดสอบให้ครบทุกข้อ");
       return;
     }
-  
+
     try {
       let testid = null;
-  
+
       if (user) {
-        const saveTestRes = await fetch(`${BACKEND_URL}/save-test`, {
+        const saveTestRes = await fetch(`${API_URL}/save-test`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            user_id: user.userid,
-            answers: combinedArray,
-          }),
+          body: JSON.stringify({ user_id: user.userid, answers: combinedArray }),
         });
-  
         const testData = await saveTestRes.json();
         if (!saveTestRes.ok) throw new Error(testData.error || "บันทึกแบบทดสอบไม่สำเร็จ");
         testid = testData.testid;
       }
-  
-      // เรียก predict จาก Flask (ไม่ว่าล็อกอินหรือไม่)
-      const predictRes = await fetch(`${API_URL}/predict`, {
+
+      const predictRes = await fetch(`${FLASK_URL}/predict`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ answers: combinedArray, user_id: user?.userid || null }),
       });
-  
-      const predictData = await predictRes.json();
+
+      const predictData = await predictAnswers(combinedArray, user?.userid || null);
       if (!predictRes.ok) throw new Error(predictData.error || "เกิดข้อผิดพลาดจากการประมวลผล");
-  
-      setResult(predictData); // แสดงผลลัพธ์
-  
-      if (user && testid) {
-        // บันทึก recommendation ลง DB
-        const saveReco = await fetch(`${BACKEND_URL}/results`, {
+      setResult(predictData);
+
+      
+    await fetchRecommendedCareers();
+    setStep(3);if (user && testid) {
+        const saveReco = await fetch(`${API_URL}/results`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -119,29 +99,55 @@ const TestPage = () => {
             big5_group: predictData.big5_group,
           }),
         });
-  
+
         const recoData = await saveReco.json();
         if (!saveReco.ok) throw new Error(recoData.error || "บันทึกผลลัพธ์ไม่สำเร็จ");
-  
-        console.log("✅ บันทึก recommendation แล้ว:", recoData);
       }
-  
+
     } catch (error) {
-      console.error("❌ Error:", error);
       alert("เกิดข้อผิดพลาด: " + error.message);
     }
-  };  
-  
+  };
+
+  const fetchRecommendedCareers = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/user/${user.userid}/recommended-careers`);
+      setCareers(res.data.careers);
+    } catch (err) {
+      console.error("❌ ไม่สามารถโหลดอาชีพที่แนะนำ:", err);
+    }
+  };
+
+  const fetchMajors = async (careerId, careerName) => {
+    setSelectedCareerId(careerId);
+    setSelectedCareerName(careerName);
+    setMajorDetail(null);
+    try {
+      const res = await axios.get(`${API_URL}/careers/${careerId}/majors`);
+      setMajors(res.data.majors);
+    } catch (err) {
+      console.error("❌ ไม่สามารถโหลดสาขา:", err);
+    }
+  };
+
+  const fetchMajorDetail = async (majorId) => {
+    try {
+      const res = await axios.get(`${API_URL}/majors/${majorId}/detail`);
+      setMajorDetail(res.data);
+    } catch (err) {
+      console.error("❌ ไม่สามารถโหลดรายละเอียดสาขา:", err);
+    }
+  };
+
+  useEffect(() => { if (user) { fetchRecommendedCareers(); } }, [user]);
 
   const handleAnswer = (answer, questionIndex) => {
     let score = getScoreFromOption(answer);
-    if (step === 1 && negativeScoreQuestions.includes(questionIndex)) {
-      score = -score;
-    }
+    if (step === 1 && negativeScoreQuestions.includes(questionIndex)) score = -score;
     if (step === 1) {
-      setPersonalityAnswers((prev) => ({ ...prev, [questionIndex]: score }));
+      setPersonalityAnswers(prev => ({ ...prev, [questionIndex]: score }));
     } else if (step === 2) {
-      setInterestAnswers((prev) => ({ ...prev, [questionIndex]: score }));
+      setInterestAnswers(prev => ({ ...prev, [questionIndex]: score }));
     }
   };
 
@@ -300,34 +306,46 @@ const TestPage = () => {
               </div>
             </div>
           )}
-           {step === 3 && (
-              <div className={styles.resultContainer}>
-                <h2 className={styles.resultTitle}>การจับคู่ของคุณ: คุณเป็นคนประเภท......</h2>
-                <div className={styles.resultSection}>
-                  <div className={styles.resultDescription}>
-                    {/* {ไว้ใส่ข้อมูล เมื่อ model ให้ผลลัพท์ออกมา} */}
-                  </div>
-                </div>
+          {step === 3 && (
+            <div className={styles.resultContainer}>
+              <h2 className={styles.resultTitle}>อาชีพที่เหมาะกับคุณ</h2>
+              <ul>
+                {careers.map(c => (
+                  <li key={c.careerid} onClick={() => fetchMajors(c.careerid, c.careername)} style={{ cursor: "pointer", marginBottom: "5px" }}>
+                    👉 {c.careername}
+                  </li>
+                ))}
+              </ul>
 
-                <h2 className={styles.resultTitle}>ความสนใจของคุณ: .......</h2>
-                <div className={styles.resultSection}>
-                  <div className={styles.resultDescription}>
-                    {/* {ไว้ใส่ข้อมูล เมื่อ model ให้ผลลัพท์ออกมา} */}
-                  </div>
-                </div>
+              {selectedCareerId && (
+                <>
+                  <h3>สาขาที่เกี่ยวข้องกับอาชีพ: {selectedCareerName}</h3>
+                  <ul>
+                    {majors.map(m => (
+                      <li key={m.majorid} onClick={() => fetchMajorDetail(m.majorid)} style={{ cursor: "pointer", marginLeft: "1rem" }}>
+                        🎓 {m.majorname}
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
 
-                <h2 className={styles.resultTitle}>คุณเหมาะกับอาชีพและคณะ วิศวกรรมคอมพิวเตอร์</h2>
-                <div className={styles.resultSection}>
-                  <div className={styles.resultDescription}>
-                    {/* {ไว้ใส่ข้อมูล เมื่อ model ให้ผลลัพท์ออกมา} */}
-                    วิศวกรรมคอมพิวเตอร์ผสมผสานหลักการของวิศวกรรมไฟฟ้าและวิทยาการ
-                    คอมพิวเตอร์ พัฒนา และเพิ่มประสิทธิภาพของระบบคอมพิวเตอร์ ฮาร์ดแวร์ และซอฟต์แวร์ ซึ่งเป็นกระดูกสันหลังของเทคโนโลยีสมัยใหม่ ขับเคลื่อนนวัตกรรมในด้านปัญญาประดิษฐ์ (AI), อินเทอร์เน็ตของสรรพสิ่ง (IoT), หุ่นยนต์ และอื่นๆ
-                  </div>
+              {majorDetail && (
+                <div style={{ marginTop: "1rem" }}>
+                  <h4>📝 รายละเอียดสาขา: {majorDetail.majorname}</h4>
+                  <p>{majorDetail.description}</p>
+                  <p><strong>คณะ:</strong> {majorDetail.faculty?.facultyname || "ไม่พบข้อมูล"}</p>
+                  <h4>🏫 มหาวิทยาลัยที่เปิดสอน</h4>
+                  <ul>
+                    {majorDetail.universities.map(u => (
+                      <li key={u.universityid}>{u.universityname} - {u.location}</li>
+                    ))}
+                  </ul>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
+          )}
         </div>
-
         {/* ด้านขวาของหน้าจอ */}
         <div className={styles.rightBox} style={{ padding: "52px 55px 0px 70px" }}>
         <Steps

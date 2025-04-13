@@ -70,8 +70,8 @@ def predict():
         print(f"📌 กลุ่ม Holland: {holland_pred}, กลุ่ม Big5: {big5_pred}")
 
         predictions = {
-            "holland_group": holland_pred + 1,
-            "big5_group": big5_pred + 1
+            "holland_group": holland_pred,
+            "big5_group": big5_pred
         }
 
         try:
