@@ -150,7 +150,7 @@ const ProfilePage = () => {
                   
                   {/* เพิ่มช่องเบอร์โทรศัพท์ตรงนี้ */}
                   <Item label={<span style={{ fontSize: '16px' }}>เบอร์โทรศัพท์</span>} name="phonenumber">
-                    <Input className={styles.inputStylename} prefix={<PhoneOutlined />} />
+                    <Input className={styles.inputStylephone} prefix={<PhoneOutlined />} />
                   </Item>
 
                   <Row gutter={16}>
@@ -165,7 +165,7 @@ const ProfilePage = () => {
                     </Col>
                     <Col span={12}>
                       <Item label={<span style={{ fontSize: '16px' }}>วันเกิด</span>} name="dateOfBirth">
-                        <DatePicker className={styles.inputStylename2} />
+                        <DatePicker className={styles.inputStylename3} />
                       </Item>
                     </Col>
                   </Row>
