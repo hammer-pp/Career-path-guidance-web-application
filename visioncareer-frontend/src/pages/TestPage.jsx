@@ -306,45 +306,63 @@ const TestPage = () => {
               </div>
             </div>
           )}
-          {step === 3 && (
-            <div className={styles.resultContainer}>
-              <h2 className={styles.resultTitle}>อาชีพที่เหมาะกับคุณ</h2>
-              <ul>
-                {careers.map(c => (
-                  <li key={c.careerid} onClick={() => fetchMajors(c.careerid, c.careername)} style={{ cursor: "pointer", marginBottom: "5px" }}>
-                    👉 {c.careername}
-                  </li>
-                ))}
-              </ul>
+{step === 3 && (
+  <div className={styles.resultContainer}>
+    <h2 className={styles.resultTitle}>อาชีพที่เหมาะกับคุณ</h2>
+    <div className={styles.careersGrid}>
+      {careers.map(c => (
+        <div 
+          key={c.careerid} 
+          className={`${styles.careerCard} ${selectedCareerId === c.careerid ? styles.selectedCareer : ''}`}
+          onClick={() => fetchMajors(c.careerid, c.careername)}
+        >
+          <div className={styles.careerName}>{c.careername}</div>
+          <div className={styles.careerDescription}>{c.description}</div>
+        </div>
+      ))}
+    </div>
 
-              {selectedCareerId && (
-                <>
-                  <h3>สาขาที่เกี่ยวข้องกับอาชีพ: {selectedCareerName}</h3>
-                  <ul>
-                    {majors.map(m => (
-                      <li key={m.majorid} onClick={() => fetchMajorDetail(m.majorid)} style={{ cursor: "pointer", marginLeft: "1rem" }}>
-                        🎓 {m.majorname}
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
-
-              {majorDetail && (
-                <div style={{ marginTop: "1rem" }}>
-                  <h4>📝 รายละเอียดสาขา: {majorDetail.majorname}</h4>
-                  <p>{majorDetail.description}</p>
-                  <p><strong>คณะ:</strong> {majorDetail.faculty?.facultyname || "ไม่พบข้อมูล"}</p>
-                  <h4>🏫 มหาวิทยาลัยที่เปิดสอน</h4>
-                  <ul>
-                    {majorDetail.universities.map(u => (
-                      <li key={u.universityid}>{u.universityname} - {u.location}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+    {selectedCareerId && (
+      <div className={styles.majorsSection}>
+        <h3 className={styles.sectionTitle}>สาขาที่เกี่ยวข้องกับอาชีพ: {selectedCareerName}</h3>
+        <div className={styles.majorsGrid}>
+          {majors.map(m => (
+            <div 
+              key={m.majorid} 
+              className={`${styles.majorCard} ${majorDetail?.majorid === m.majorid ? styles.selectedMajor : ''}`}
+              onClick={() => fetchMajorDetail(m.majorid)}
+            >
+              <div className={styles.majorIcon}>🎓</div>
+              <div className={styles.majorName}>{m.majorname}</div>
             </div>
-          )}
+          ))}
+        </div>
+      </div>
+    )}
+
+    {majorDetail && (
+      <div className={styles.majorDetailSection}>
+        <h4 className={styles.sectionTitle}>📝 รายละเอียดสาขา: {majorDetail.majorname}</h4>
+        <p className={styles.detailText}>{majorDetail.description}</p>
+        
+        <div className={styles.detailRow}>
+          <span className={styles.detailLabel}>คณะ:</span>
+          <span className={styles.detailValue}>{majorDetail.faculty?.facultyname || "ไม่พบข้อมูล"}</span>
+        </div>
+
+        <h4 className={styles.sectionTitle}>🏫 มหาวิทยาลัยที่เปิดสอน</h4>
+        <div className={styles.universitiesList}>
+          {majorDetail.universities.map(u => (
+            <div key={u.universityid} className={styles.universityItem}>
+              <div className={styles.universityName}>{u.universityname}</div>
+              <div className={styles.universityLocation}>{u.location}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+)}
         </div>
         {/* ด้านขวาของหน้าจอ */}
         <div className={styles.rightBox} style={{ padding: "49px 55px 0px 70px" }}>
