@@ -1,0 +1,225 @@
+.container {
+    padding: 20px 410px 15px;
+    width: 100%;
+  }
+  
+  .pageHeader {
+    margin-bottom: 40px;
+  }
+ 
+
+  /* เมนูขวา */
+  .sidebar {
+    height: 100%;
+    position: sticky;
+    top: 20px;
+    padding: 0;
+    border-radius: 30px;
+  }
+  
+  .menu {
+    border-right: none;
+    font-size: 20px;
+    font-weight: 400; 
+    word-wrap: break-word;
+    /* padding: 10px; */
+  }
+  
+  /* เนื้อหาหลักซ้ายมือ */
+  .contentCard {
+    /* width: 1120px; */
+    width: 800px;
+    /* width: 900px; */
+    min-height: 720px;
+    font-size: 20px;
+    padding: 25px 60px 15px;
+    border-radius: 30px;
+  }
+  
+  /* ส่วนโปรไฟล์ */
+  .profileSection {
+    padding: 20px 0;
+  }
+  
+
+  
+  .uploadButton {
+    width: 100%;
+  }
+  
+  .ant-form-item {
+    margin-bottom: 20px;
+  }
+  
+  .ant-form-item-label > label {
+    font-weight: 500;
+    color: #2c3e50;
+  }
+  
+  /* Divider */
+  .ant-divider {
+    margin: 24px 0;
+    border-top: 1px solid #e8e8e8;
+  }
+  
+  .submitbutton {
+    max-width: 160px;
+  }
+  
+  /* ปุ่มบันทึก */
+  .buttonStyle {
+    margin-top: 20px;
+    width: 50px;
+    height: 40px;
+    border-radius: 30px;
+    font-size: 16px;
+  }
+
+  .buttonStyle2 {
+    margin-top: 10px;
+    width: 160px;
+    height: 40px;
+    border-radius: 30px;
+    font-size: 16px;
+  }
+  
+  /* inputbox */
+  .inputStyle{
+    /* width: 470px; */
+    width: 304px !important; /* เปลี่ยนจาก width ตายตัวเป็น 100% */
+    height: 40px;
+    border-radius: 10px;
+    font-size: 16px;
+  }
+  .inputStylename{
+    width: 304px !important;
+    /* width: 100%; เปลี่ยนจาก width ตายตัวเป็น 100% */
+    height: 40px;
+    border-radius: 10px;
+    font-size: 16px;
+  }
+  .inputStylephone{
+    /* width: 470px; */
+    width: 304px !important; /* เปลี่ยนจาก width ตายตัวเป็น 100% */
+    height: 40px;
+    border-radius: 10px;
+    font-size: 16px;
+    /* margin-left: 10px; */
+  }
+  
+  /* inputbox name */
+  .inputStylename2{
+    width: 100% !important;
+    /* width: 100%;  */
+    height: 40px;
+    border-radius: 10px;
+    font-size: 16px;
+  }
+  /* เพิ่ม style สำหรับ container ของ input คู่ */
+.inputPairContainer {
+    display: flex;
+    gap: 16px;
+  }
+  
+  .inputPairContainer .ant-form-item {
+    flex: 1;
+    min-width: 0; /* ช่วยป้องกันปัญหา overflow */
+  }
+  /* ส่วนผลการทดสอบ */
+  .testResultCard {
+    background: #f9f9f9;
+    border-radius: 30px;
+    padding: 50px;
+    margin-bottom: 20px;
+    border: 1px solid #e8e8e8;
+    font-size: 16px;
+  }
+  
+  .testResultCard h4 {
+    color: #0357AF;
+    margin-bottom: 10px;
+    font-size: 20px;
+  }
+  
+  .testResultCard p {
+    margin-bottom: 10px;
+    font-size: 18px;
+    font-weight: 400;
+    word-wrap: break-word;
+  }
+  
+  /* เมนูซ้าย */
+  .horizontalMenu {
+    line-height: 46px;
+    font-size: 20px;
+    font-weight: 400;
+    word-wrap: break-word;
+    border-bottom: none;
+    background: none;
+  }
+  /* ปรับ padding สำหรับ input ทุกประเภท */
+    .ant-input,
+    .ant-picker-input > input,
+    .ant-select-selection-search-input {
+    padding: 0 14px 1px !important; /* บน-ล่าง 8px, ซ้าย-ขวา 12px */
+     text-align: left; /* หรือจะใช้ center ถ้าต้องการให้อยู่กึ่งกลาง */
+    }
+    .testResultsSection {
+      max-height: 500px; /* กำหนดความสูงสูงสุด */
+      overflow-y: auto; /* ให้สามารถเลื่อนได้เมื่อเนื้อหาเกิน */
+      padding: 16px;
+      border: 1px solid #f0f0f0;
+      border-radius: 8px;
+      background: #fff;
+    }
+    
+    /* สไตล์ scrollbar */
+    .testResultsSection::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .testResultsSection::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    
+    .testResultsSection::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+    }
+    
+    .testResultsSection::-webkit-scrollbar-thumb:hover {
+      background: #555; 
+    }
+  /* Responsive Design */
+  @media (max-width: 1200px) {
+    .container {
+      padding: 30px;
+    }
+    
+    .contentCard {
+      width: 100%;
+      padding: 20px;
+    }
+    
+    .avatarUpload {
+      margin-bottom: 20px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .container {
+      padding: 15px;
+    }
+    
+    .contentCard {
+      padding: 15px;
+    }
+    
+    .testResultCard {
+      padding: 20px;
+    }
+    
+    .submitButton {
+      max-width: 100%;
+    }
+  }

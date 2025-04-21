@@ -7,8 +7,25 @@
 }
 
 .username {
-  font-weight: bold;
+  color: black;
+  font-size: 20px;
+  font-weight: 400;
+  word-wrap: break-word;
 }
+
+.avatar {
+  /* background-color: linear-gradient(90deg, #FFE259 0%, #E4815A 100%); */
+  background: linear-gradient(90deg, #FFE259 0%, #E4815A 100%);
+  border: none;
+  cursor: pointer;
+}
+    /* เพิ่มสไตล์สำหรับชื่อผู้ใช้และ Avatar */
+.userInfo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
 
 .dropdownMenu {
   position: absolute;
@@ -17,7 +34,7 @@
   background-color: white;
   box-shadow: 0px 2px 8px rgba(0,0,0,0.15);
   z-index: 1000;
-  border-radius: 4px;
+  border-radius: 10px;
   overflow: hidden;
   min-width: 180px;
 }

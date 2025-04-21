@@ -13,7 +13,8 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const data = await loginUser(email, password);
+    const normalizedEmail = email.toLowerCase();
+    const data = await loginUser(normalizedEmail, password);
     if (data) {
       login(data.user, data.token);
       navigate("/"); // 🔹 ไปหน้าหลักหลังจากล็อกอิน

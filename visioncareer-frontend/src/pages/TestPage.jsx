@@ -347,7 +347,7 @@ const TestPage = () => {
           )}
         </div>
         {/* ด้านขวาของหน้าจอ */}
-        <div className={styles.rightBox} style={{ padding: "52px 55px 0px 70px" }}>
+        <div className={styles.rightBox} style={{ padding: "49px 55px 0px 70px" }}>
         <Steps
               direction="vertical"
               current={step >= 3 ? 4 : step}

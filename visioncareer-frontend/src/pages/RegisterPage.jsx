@@ -17,7 +17,9 @@ const RegisterPage = () => {
       alert("รหัสผ่านไม่ตรงกัน");
       return;
     }
-    const data = await registerUser(fullname, email, password);
+   // แปลง email เป็นตัวพิมพ์เล็กก่อนส่งไปยัง API
+  const normalizedEmail = email.toLowerCase();
+  const data = await registerUser(fullname, normalizedEmail, password);
     if (data) {
       alert("สมัครสมาชิกสำเร็จ!");
       navigate("/login");
