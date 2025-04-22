@@ -4,7 +4,7 @@ import xgboost as xgb
 
 # ตรวจสอบโฟลเดอร์ที่ไฟล์ `.pkl` อยู่จริง
 current_dir = os.path.dirname(os.path.abspath(__file__))  # โฟลเดอร์ที่รันสคริปต์
-pkl_dir = current_dir  # ใช้โฟลเดอร์ปัจจุบัน
+pkl_dir = os.path.abspath(os.path.join(current_dir, ".."))
 
 # ตรวจสอบว่าไฟล์มีอยู่จริงหรือไม่
 holland_path = os.path.join(pkl_dir, "xgb_model_holland.pkl")
