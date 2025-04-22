@@ -96,10 +96,10 @@ plt.title(" XGBoost"+" Accuracy vs. Number of Estimators")
 plt.legend()
 plt.show()
 
-# Get current working directory (Notebook/), go to ML/
-current_dir = os.getcwd()
-root_dir = os.path.abspath(os.path.join(current_dir, ".."))  # ML/
+current_dir = os.path.dirname(os.path.abspath(__file__))
 # Full path to save the model in ML/
+root_dir = os.path.abspath(os.path.join(current_dir, "..","artifacts"))
+# Full path to save the model in ML/artifacts
 model_path = os.path.join(root_dir, "xgb_model_big5.pkl")
 
 

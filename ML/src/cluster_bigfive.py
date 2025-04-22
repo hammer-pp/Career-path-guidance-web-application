@@ -35,7 +35,7 @@ df = df.dropna(axis=0)
 df_sample = df
 
 # Save the scaler for later use
-root_dir = os.path.abspath(os.path.join(current_dir, ".."))
+root_dir = os.path.abspath(os.path.join(current_dir, "..","artifacts"))
 joblib.dump(scaler, os.path.join(root_dir, 'bigfive_scaler.pkl'))
 
 ############ Clustering ############
