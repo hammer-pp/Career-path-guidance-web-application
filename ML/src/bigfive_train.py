@@ -81,26 +81,11 @@ train_accuracies_xgb = []
 test_accuracies_xgb = []
 n_estimators_list = range(1,21)
 
-for n in n_estimators_list:
-    x_xgb =  xgb.XGBClassifier(n_estimators=n, random_state=42)
-    x_xgb.fit(X_train, y_train)
-    train_accuracies_xgb.append(accuracy_score(y_train, x_xgb.predict(X_train)))
-    test_accuracies_xgb.append(accuracy_score(y_test, x_xgb.predict(X_test)))
-
-plt.figure(figsize=(10, 6))
-plt.plot(n_estimators_list, train_accuracies_xgb, label="Train Accuracy")
-plt.plot(n_estimators_list, test_accuracies_xgb, label="Test Accuracy")
-plt.xlabel('Number of Estimators')
-plt.ylabel('Accuracy')
-plt.title(" XGBoost"+" Accuracy vs. Number of Estimators")
-plt.legend()
-plt.show()
-
 current_dir = os.path.dirname(os.path.abspath(__file__))
 # Full path to save the model in ML/
 root_dir = os.path.abspath(os.path.join(current_dir, "..","artifacts"))
 # Full path to save the model in ML/artifacts
-model_path = os.path.join(root_dir, "xgb_model_big5.pkl")
+model_path = os.path.join(root_dir, "xgb_model_bigfive.pkl")
 
 
 # Save the model
