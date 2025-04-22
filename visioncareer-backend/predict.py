@@ -5,24 +5,33 @@ import xgboost as xgb
 import requests
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import joblib
 
 app = Flask(__name__)
 CORS(app)
 BACKEND_URL = "http://localhost:5000"
 
-ML_DIR = os.path.join(os.path.dirname(__file__), "../ML")
-
-models = {
-    "holland": xgb.Booster(),
-    "big5": xgb.Booster()
-}
+ML_DIR = os.path.join(os.path.dirname(__file__), "../ML","artifacts")
 
 try:
-    models["holland"].load_model(os.path.join(ML_DIR, "xgb_model_holland.json"))
-    models["big5"].load_model(os.path.join(ML_DIR, "xgb_model_big5.json"))
+    models = {
+        "holland": joblib.load(os.path.join(ML_DIR, "xgb_model_holland.pkl")),
+        "big5": joblib.load(os.path.join(ML_DIR, "xgb_model_bigfive.pkl"))
+    }
     print("✅ โมเดลโหลดสำเร็จ!")
 except Exception as e:
     print(f"❌ เกิดข้อผิดพลาดในการโหลดโมเดล: {e}")
+
+try:
+    scalers = {
+    "holland": joblib.load(os.path.join(ML_DIR, "holland_scaler.pkl")),
+    "big5": joblib.load(os.path.join(ML_DIR, "bigfive_scaler.pkl"))
+}
+    print("✅ scalerโหลดสำเร็จ!")
+except Exception as e:
+    print(f"❌ เกิดข้อผิดพลาดในการโหลดscaler: {e}")
+
+
 
 holland_features = ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8',
                     'I1', 'I2', 'I3', 'I4', 'I5', 'I6', 'I7', 'I8',
@@ -44,28 +53,44 @@ def home():
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
+        # Get the request data
         data = request.get_json()
         print("📥 Raw data from frontend:", data)
         answers = data.get("answers", [])
         user_id = data.get("user_id", None)
 
+        # Validate the input data
         if len(answers) != 81:
             return jsonify({'error': f'Feature shape mismatch: expected 81, got {len(answers)}'}), 400
 
         answers_array = np.array(answers)
 
         # ✅ แก้ slice ให้ถูกต้อง
-        holland_data = answers_array[:48]
-        big5_data = answers_array[48:]
+        big5_data= answers_array[:33]
+        holland_data = answers_array[33:]
 
-        print("✅ Holland (48):", holland_data.tolist())
         print("✅ Big5 (33):", big5_data.tolist())
-
+        print("✅ Holland (48):", holland_data.tolist())
+        
+       # Create DataFrames for the features
         holland_df = pd.DataFrame([holland_data], columns=holland_features)
         big5_df = pd.DataFrame([big5_data], columns=big5_features)
 
-        holland_pred = int(np.argmax(models["holland"].predict(xgb.DMatrix(holland_df))))
-        big5_pred = int(np.argmax(models["big5"].predict(xgb.DMatrix(big5_df))))
+        # ✅ Apply scalers
+        holland_scaled = scalers["holland"].transform(holland_df)
+        big5_scaled = scalers["big5"].transform(big5_df)
+
+        # Convert Scaler data to DataFrame 
+        holland_scaled = pd.DataFrame(holland_scaled, columns=holland_features)
+        big5_scaled = pd.DataFrame(big5_scaled, columns=big5_features)
+
+        # XGBoost prediction 
+        holland_pred = models["holland"].predict(holland_scaled)
+        big5_pred = models["big5"].predict(big5_scaled)
+
+        # Convert predictions to integers
+        holland_pred = int(holland_pred[0])
+        big5_pred = int(big5_pred[0])
 
         print(f"📌 กลุ่ม Holland: {holland_pred}, กลุ่ม Big5: {big5_pred}")
 
