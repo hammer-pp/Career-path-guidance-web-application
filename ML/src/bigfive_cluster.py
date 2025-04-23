@@ -22,13 +22,13 @@ data[['EXT2','EXT4','EXT8','EST2','EST4','AGR1','AGR3','CSN2','CSN4','CSN6','CSN
 df = data.drop('country', axis=1)
 
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MaxAbsScaler
 import joblib
 
 columns = list(df.columns)
 
 # Standardize the data
-scaler = MinMaxScaler()
+scaler = MaxAbsScaler()
 df = scaler.fit_transform(df)
 df = pd.DataFrame(df, columns=columns)
 df = df.dropna(axis=0)
