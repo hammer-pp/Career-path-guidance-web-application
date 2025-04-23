@@ -53,7 +53,6 @@ app.get("/test-db", async (req, res) => {
   }
 });
 
-
 app.get("/users", async (req, res) => {
     try {
       const users = await db("users").select("*");
@@ -163,83 +162,76 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.post("/save-test", async (req, res) => {
-  const { user_id, answers } = req.body;
-
-  if (!user_id || !answers || answers.length !== 81) {
-    return res.status(400).json({ error: "Invalid data received." });
-  }
-
+app.post("/get-mapped-careers", async (req, res) => {
   try {
-    const now = new Date();
-    const inserted = await db("tests").insert({
-      userid: user_id,
-      score: JSON.stringify(answers),
-      createdat: now,
-    }).returning("testid");
-
-    console.log("✅ Saved test result to database:", inserted[0]);
-    res.status(200).json({ testid: inserted[0] });
+    const { holland_group, big5_group } = req.body;
+    if (holland_group === undefined || big5_group === undefined) {
+      return res.status(400).json({ error: "Missing group" });
+    }
+    const career_ids = await getMappedCareers(holland_group, big5_group);
+    res.json({ career_ids });
   } catch (error) {
-    console.error("❌ Failed to save test result:", error);
-    res.status(500).json({ error: "Failed to save test result" });
+    res.status(500).json({ error: "Failed to map careers" });
   }
 });
 
-
-app.post("/results", async (req, res) => {
-  const { user_id, holland_group, big5_group } = req.body;
-
-  if (!user_id || holland_group === undefined || big5_group === undefined) {
-    return res.status(400).json({ error: "Missing required prediction data." });
-  }
-
+// PATCH /save-test ตาม logic ใหม่
+app.post("/save-test", async (req, res) => {
   try {
-    const latestTest = await db("tests")
-      .where("userid", user_id)
-      .orderBy("createdat", "desc")
-      .first();
+    const { user_id, answers, holland_group, big5_group } = req.body;
+    if (!user_id || !answers || holland_group === undefined || big5_group === undefined)
+      return res.status(400).json({ error: "Missing data" });
 
-    if (!latestTest) {
-      return res.status(400).json({ error: "No test record found to associate recommendation." });
-    }
-
-    const testid = latestTest.testid;
-
-    // ✅ อัปเดตกลุ่มลงตาราง tests
-    await db("tests")
-      .where("testid", testid)
-      .update({ holland_group, big5_group });
-
-    // ✅ ดึง career_ids จาก mapping CSV
-    const career_ids = await getMappedCareers(holland_group, big5_group);
-
-    // ✅ กรองเฉพาะอาชีพที่มีใน major_career
-    const validCareerIds = await db("major_career").distinct("careerid").pluck("careerid");
-    const filteredCareerIds = career_ids.filter(cid => validCareerIds.includes(cid));
-
-    if (filteredCareerIds.length === 0) {
-      return res.status(404).json({ error: "ไม่พบอาชีพที่เชื่อมโยงกับกลุ่มนี้ในฐานข้อมูล" });
-    }
-
-    // ✅ ลบรายการเก่าของ testid นี้ (กัน insert ซ้ำ)
-    await db("recommendations").where("testid", testid).del();
-
-    // ✅ เพิ่มรายการใหม่
     const now = new Date();
-    await db("recommendations").insert(
-      filteredCareerIds.map(cid => ({
+    const [test] = await db("tests")
+      .insert({
         userid: user_id,
-        testid,
-        careerid: cid,
-        createdat: now
-      }))
-    );
+        score: JSON.stringify(answers),
+        createdat: now,
+        holland_group: holland_group,
+        big5_group: big5_group
+      })
+      .returning(["testid"]);
+    res.json({ testid: test.testid });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to save test" });
+  }
+});
 
-    res.status(200).json({ message: "Prediction result saved", career_ids: filteredCareerIds });
-  } catch (err) {
-    console.error("❌ Failed to save prediction result:", err);
-    res.status(500).json({ error: "Server error while saving prediction result" });
+// PATCH /results
+app.post("/results", async (req, res) => {
+  try {
+    const { user_id, testid, careerids } = req.body;
+    if (!user_id || !testid || !Array.isArray(careerids) || careerids.length === 0)
+      return res.status(400).json({ error: "Missing data" });
+
+    const now = new Date();
+    const recs = careerids.map(careerid => ({
+      userid: user_id,
+      testid: testid,
+      careerid: careerid,
+      createdat: now
+    }));
+    await db("recommendations").insert(recs);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to save recommendations" });
+  }
+});
+
+// GET /careers/all?ids=1,2,3
+app.get('/careers/all', async (req, res) => {
+  try {
+    const ids = req.query.ids
+      ? req.query.ids.split(',').map(Number).filter(id => !isNaN(id))
+      : [];
+    if (!ids.length) {
+      return res.status(400).json({ error: "No ids provided." });
+    }
+    const careers = await db('careers').whereIn('careerid', ids);
+    res.json(careers);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 

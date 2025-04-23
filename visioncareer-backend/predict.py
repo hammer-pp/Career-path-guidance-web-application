@@ -98,25 +98,10 @@ def predict():
             "holland_group": holland_pred,
             "big5_group": big5_pred
         }
-
-        try:
-            response = requests.post(f"{BACKEND_URL}/results", json={
-                "user_id": user_id,
-                "holland_group": predictions["holland_group"],
-                "big5_group": predictions["big5_group"]
-            })
-
-            if response.status_code != 200:
-                print("❌ Failed to save prediction result:", response.json())
-        except Exception as err:
-            print("❌ ไม่สามารถบันทึกผลลัพธ์ไปที่ Backend:", err)
-
         return jsonify(predictions)
-
     except Exception as e:
-        print("❌ SERVER ERROR:", str(e))  # Log ข้อผิดพลาดเพื่อ Debug
-        return jsonify({"error": str(e)}), 500
-
+        return jsonify({"error": str(e)}), 400
+    
 if __name__ == "__main__":
     print("🚀 กำลังรัน Flask API บนพอร์ต 5001...")
     app.run(host="0.0.0.0", port=5001, debug=True)

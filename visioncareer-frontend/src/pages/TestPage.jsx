@@ -7,7 +7,7 @@ import axios from 'axios';
 import { predictAnswers } from "../api";
 
 const FLASK_URL = import.meta.env.VITE_FLASK_URL;
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL || "/api";
 
 const { Step } = Steps;
 
@@ -25,7 +25,7 @@ const TestPage = () => {
   const [selectedCareerName, setSelectedCareerName] = useState("");
   const [majors, setMajors] = useState([]);
   const [majorDetail, setMajorDetail] = useState(null);
-
+  const [loading, setLoading] = useState(false);
   const startTest = () => setStep(0.5);
   const startTestper = () => setStep(1);
   const startInterestTest = () => {
@@ -49,64 +49,100 @@ const TestPage = () => {
     setAnswers(newAnswers);
   };
 
+  // ฟังก์ชันส่งคำตอบทั้งหมดไปประมวลผล
   const handleSubmit = async () => {
+    if (loading) return;
+    setLoading(true);
+
+    // รวมคำตอบทั้งหมด (index 0-80)
     const combinedAnswers = {
       ...personalityAnswers,
       ...Object.fromEntries(
         Object.entries(interestAnswers).map(([key, value]) => [parseInt(key) + 33, value])
       ),
     };
-    const combinedArray = Array(81).fill(0).map((_, index) => combinedAnswers[index]);
+    const combinedArray = Array(81).fill(0).map((_, idx) => combinedAnswers[idx]);
 
     if (combinedArray.length !== 81 || combinedArray.includes(undefined)) {
       alert("กรุณาทำแบบทดสอบให้ครบทุกข้อ");
+      setLoading(false);
       return;
     }
 
     try {
-      let testid = null;
-
-      if (user) {
-        const saveTestRes = await fetch(`${API_URL}/save-test`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ user_id: user.userid, answers: combinedArray }),
-        });
-        const testData = await saveTestRes.json();
-        if (!saveTestRes.ok) throw new Error(testData.error || "บันทึกแบบทดสอบไม่สำเร็จ");
-        testid = testData.testid;
-      }
-
+      // 1. ส่งไป Flask /predict
       const predictRes = await fetch(`${FLASK_URL}/predict`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ answers: combinedArray, user_id: user?.userid || null }),
+        body: JSON.stringify({
+          answers: combinedArray,
+          user_id: user?.userid || null,
+        }),
       });
+      const predictData = await predictRes.json();
+      if (!predictRes.ok || predictData.error) throw new Error(predictData?.error || "เกิดข้อผิดพลาดจากการประมวลผล");
 
-      const predictData = await predictAnswers(combinedArray, user?.userid || null);
-      if (!predictRes.ok) throw new Error(predictData.error || "เกิดข้อผิดพลาดจากการประมวลผล");
-      setResult(predictData);
+      const { holland_group, big5_group } = predictData;
 
-      
-    await fetchRecommendedCareers();
-    setStep(3);if (user && testid) {
-        const saveReco = await fetch(`${API_URL}/results`, {
+      // 2. หาอาชีพที่เหมาะสมจาก Node.js
+      const mapRes = await fetch(`${API_URL}/get-mapped-careers`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          holland_group,
+          big5_group,
+        }),
+      });
+      const mapData = await mapRes.json();
+      if (!mapRes.ok || mapData.error) throw new Error(mapData.error || "ดึงข้อมูลอาชีพล้มเหลว");
+
+      // ถ้ามี career_ids ค่อย fetch รายละเอียด
+      let careerObjects = [];
+      if (Array.isArray(mapData.career_ids) && mapData.career_ids.length > 0) {
+        const careersRes = await fetch(`${API_URL}/careers/all?ids=${mapData.career_ids.join(",")}`);
+        careerObjects = await careersRes.json();
+        setCareers(careerObjects);
+      } else {
+        setCareers([]);
+      }
+
+      // 3. ถ้ามี user → save-test และ save recommendations
+      if (user?.userid) {
+        // save-test (รับ testid กลับมา)
+        const saveTestRes = await fetch(`${API_URL}/save-test`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             user_id: user.userid,
-            holland_group: predictData.holland_group,
-            big5_group: predictData.big5_group,
+            answers: combinedArray,
+            holland_group,
+            big5_group,
           }),
         });
+        const testData = await saveTestRes.json();
+        if (!saveTestRes.ok || testData.error) throw new Error(testData.error || "บันทึกแบบทดสอบไม่สำเร็จ");
 
-        const recoData = await saveReco.json();
-        if (!saveReco.ok) throw new Error(recoData.error || "บันทึกผลลัพธ์ไม่สำเร็จ");
+        // save recommendations
+        await fetch(`${API_URL}/results`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            user_id: user.userid,
+            testid: testData.testid,
+            careerids: mapData.career_ids,
+          }),
+        });
       }
 
-    } catch (error) {
-      alert("เกิดข้อผิดพลาด: " + error.message);
+      setResult({
+        holland_group,
+        big5_group,
+      });
+      setStep(3);
+    } catch (err) {
+      alert("เกิดข้อผิดพลาด: " + err.message);
     }
+    setLoading(false);
   };
 
   const fetchRecommendedCareers = async () => {
