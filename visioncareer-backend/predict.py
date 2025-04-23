@@ -6,11 +6,11 @@ import requests
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import joblib
-
+from dotenv import load_dotenv
+load_dotenv()
 app = Flask(__name__)
 CORS(app)
-BACKEND_URL = "http://localhost:5000"
-
+BACKEND_URL = os.getenv('VITE_API_URL')
 ML_DIR = os.path.join(os.path.dirname(__file__), "../ML","artifacts")
 
 try:
