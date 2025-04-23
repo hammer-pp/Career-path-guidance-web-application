@@ -1,5 +1,7 @@
 require("dotenv").config(); // โหลดค่าตัวแปรจากไฟล์ .env
-
+const FLASK_URL = import.meta.env.VITE_FLASK_URL;
+const API_URL = import.meta.env.VITE_API_URL;
+const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL;
 const fs = require("fs");
 const csv = require("csv-parser");
 const path = require("path");
@@ -35,7 +37,7 @@ app.use(cors());
 app.use(express.json()); // ให้รองรับ JSON request body
 
 app.use(cors({
-  origin: ["http://localhost:5173", "http://192.168.1.78:5173"], // URL ของ Frontend (React)
+  origin: [FRONTEND_URL], // URL ของ Frontend (React)
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
