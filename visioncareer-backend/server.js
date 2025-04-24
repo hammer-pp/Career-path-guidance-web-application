@@ -179,7 +179,7 @@ app.post("/get-mapped-careers", async (req, res) => {
 app.post("/save-test", async (req, res) => {
   try {
     const { user_id, answers, holland_group, big5_group } = req.body;
-    if (!user_id || !answers || holland_group === undefined || big5_group === undefined)
+    if (user_id == null || answers == null || holland_group == null || big5_group == null)
       return res.status(400).json({ error: "Missing data" });
 
     const now = new Date();
@@ -194,6 +194,7 @@ app.post("/save-test", async (req, res) => {
       .returning(["testid"]);
     res.json({ testid: test.testid });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Failed to save test" });
   }
 });
