@@ -6,7 +6,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { predictAnswers } from "../api";
 
-const FLASK_URL = import.meta.env.VITE_FLASK_URL;
+const FLASK_URL = import.meta.env.VITE_FLASK_URL || "/model";
 const API_URL = import.meta.env.VITE_API_URL || "/api";
 
 const { Step } = Steps;
@@ -19,13 +19,14 @@ const TestPage = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [personalityAnswers, setPersonalityAnswers] = useState({});
   const [interestAnswers, setInterestAnswers] = useState({});
-
+  const [showResult, setShowResult] = useState(false);
   const [careers, setCareers] = useState([]);
   const [selectedCareerId, setSelectedCareerId] = useState(null);
   const [selectedCareerName, setSelectedCareerName] = useState("");
   const [majors, setMajors] = useState([]);
   const [majorDetail, setMajorDetail] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const startTest = () => setStep(0.5);
   const startTestper = () => setStep(1);
   const startInterestTest = () => {
@@ -70,21 +71,16 @@ const TestPage = () => {
     }
 
     try {
-      // 1. ส่งไป Flask /predict
+      // 1. ส่งคำตอบไปคำนวณที่ predict.py (Flask)
       const predictRes = await fetch(`${FLASK_URL}/predict`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          answers: combinedArray,
-          user_id: user?.userid || null,
-        }),
+        body: JSON.stringify({ answers: combinedArray, user_id: user?.userid || null }),
       });
       const predictData = await predictRes.json();
-      if (!predictRes.ok || predictData.error) throw new Error(predictData?.error || "เกิดข้อผิดพลาดจากการประมวลผล");
-
+  
       const { holland_group, big5_group } = predictData;
 
-      // 2. หาอาชีพที่เหมาะสมจาก Node.js
       const mapRes = await fetch(`${API_URL}/get-mapped-careers`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -93,6 +89,7 @@ const TestPage = () => {
           big5_group,
         }),
       });
+      
       const mapData = await mapRes.json();
       if (!mapRes.ok || mapData.error) throw new Error(mapData.error || "ดึงข้อมูลอาชีพล้มเหลว");
 
@@ -106,9 +103,9 @@ const TestPage = () => {
         setCareers([]);
       }
 
-      // 3. ถ้ามี user → save-test และ save recommendations
-      if (user?.userid) {
-        // save-test (รับ testid กลับมา)
+      // 3. save test และ recommend careers เฉพาะถ้าเป็น user
+      if (user && user.userid) {
+        // Save test ลง DB
         const saveTestRes = await fetch(`${API_URL}/save-test`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -119,30 +116,35 @@ const TestPage = () => {
             big5_group,
           }),
         });
-        const testData = await saveTestRes.json();
-        if (!saveTestRes.ok || testData.error) throw new Error(testData.error || "บันทึกแบบทดสอบไม่สำเร็จ");
-
-        // save recommendations
-        await fetch(`${API_URL}/results`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            user_id: user.userid,
-            testid: testData.testid,
-            careerids: mapData.career_ids,
-          }),
-        });
+        const testSave = await saveTestRes.json();
+  
+        // Save recommendations ถ้า save test สำเร็จ
+        if (testSave && testSave.testid) {
+          await fetch(`${API_URL}/results`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              user_id: user.userid,
+              testid: testSave.testid,
+              careerids: mapData.career_ids, // (เช็คชื่อ field ให้ตรงกับ API)
+            }),
+          });
+        }
       }
-
+      // 4. แสดงผลลัพธ์ให้ทุกกรณี (ทั้ง guest/user)
       setResult({
         holland_group,
         big5_group,
+        career_ids: mapData.career_ids,
       });
+      setShowResult(true);
       setStep(3);
     } catch (err) {
-      alert("เกิดข้อผิดพลาด: " + err.message);
-    }
-    setLoading(false);
+      setError("เกิดข้อผิดพลาดในการประมวลผล กรุณาลองใหม่อีกครั้ง");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    } 
   };
 
   const fetchRecommendedCareers = async () => {
