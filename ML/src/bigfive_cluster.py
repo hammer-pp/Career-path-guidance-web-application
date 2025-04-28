@@ -41,7 +41,7 @@ joblib.dump(scaler, os.path.join(root_dir, 'bigfive_scaler.pkl'))
 ############ Clustering ############
 from sklearn.cluster import KMeans
 
-n_label = 8
+n_label = 6
 result = []
 n_runs = 100
 
