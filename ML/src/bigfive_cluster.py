@@ -41,7 +41,7 @@ joblib.dump(scaler, os.path.join(root_dir, 'bigfive_scaler.pkl'))
 ############ Clustering ############
 from sklearn.cluster import KMeans
 
-n_label = 6
+n_label = 8
 result = []
 n_runs = 100
 
@@ -55,7 +55,7 @@ traits = {
 
 for run in range(n_runs):
     # I define 5 clusters and fit my model
-    kmeans = KMeans(n_clusters=n_label)
+    kmeans = KMeans(n_clusters=n_label,random_state=42)
     k_fit = kmeans.fit(df_sample)
 
     # Predicting the Clusters

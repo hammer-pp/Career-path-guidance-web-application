@@ -48,7 +48,7 @@ traits = {
 }
 
 for run in range(n_runs):
-    kmeans = KMeans(n_clusters=n_label)
+    kmeans = KMeans(n_clusters=n_label,random_state=42)
     k_fit = kmeans.fit(df_sample)
 
     # Predicting the Clusters
