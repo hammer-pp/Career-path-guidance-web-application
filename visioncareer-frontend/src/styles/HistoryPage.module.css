@@ -1,0 +1,31 @@
+.historyContainer {
+    padding: 20px;
+  }
+  
+  .testCard {
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s;
+  }
+  
+  .testCard:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .careerItem {
+    padding: 12px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .careerItem:hover {
+    background-color: #f5f5f5;
+    transform: translateX(5px);
+  }
+  
+  .careerContent {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }

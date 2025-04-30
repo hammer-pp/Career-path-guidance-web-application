@@ -1,0 +1,163 @@
+/* src/styles/CareerFacultyDetailPage.module.css */
+.background {
+    min-height: 87.3vh;
+    padding: 20px;
+    padding-bottom: 60px;
+    /* background-color: #f5f5f5; */
+  }
+  
+  .container {
+    background-color: #fff;
+    border-radius: 30px;
+    padding: 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
+  
+  .backButton {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    background: #0357AF;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+    font-family: 'Noto Sans Thai', sans-serif;
+    margin-top: 40px;
+    margin-right: 40px;
+  }
+  
+  .backButton:hover {
+    background: #02458e;
+  }
+  
+  .header {
+    margin-bottom: 40px;
+  }
+  
+  .info {
+    padding: 20px;
+    /* background-color: #f9f9f9; */
+    border-radius: 10px;
+  }
+  
+  .majorName {
+    font-size: 2rem;
+    color: #0357AF;
+    margin: 0 0 10px 0;
+    font-family: 'Noto Sans Thai', sans-serif;
+    font-weight: 700;
+  }
+  
+  .careerName {
+    font-size: 1.2rem;
+    color: #666;
+    margin: 0;
+    font-family: 'Noto Sans Thai', sans-serif;
+  }
+  
+  .content {
+    margin-top: 30px;
+  }
+  
+  /* ส่วนที่ปรับให้เหมือน TestPage */
+  .majorDetailSection {
+    background: white;
+    border-radius: 12px;
+    padding: 0 20px 40px 25px;
+    /* margin-top: 30px; */
+    /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); */
+    width: 100%;
+  }
+  
+  .sectionTitle {
+    color: black;
+    font-size: 24px;
+    font-family: 'Noto Sans Thai', sans-serif;
+    font-weight: 600;
+    margin: 30px 0 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f0f0f0;
+  }
+  
+  .detailText {
+    font-size: 18px;
+    line-height: 1.6;
+    color: #444;
+    margin-bottom: 20px;
+    font-family: 'Noto Sans Thai', sans-serif;
+  }
+  
+  .detailRow {
+    display: flex;
+    margin-bottom: 15px;
+    align-items: baseline;
+  }
+  
+  .detailLabel {
+    font-weight: 600;
+    font-size: 18px;
+    color: #333;
+    min-width: 50px;
+    font-family: 'Noto Sans Thai', sans-serif;
+  }
+  
+  .detailValue {
+    font-size: 18px;
+    color: #555;
+    font-family: 'Noto Sans Thai', sans-serif;
+  }
+  
+  .universitiesList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+  }
+  
+  .universityItem {
+    background: #F9F9F9;
+    border-radius: 8px;
+    padding: 15px;
+    transition: all 0.2s ease;
+  }
+  
+  .universityItem:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  
+  .universityName {
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 5px;
+    font-family: 'Noto Sans Thai', sans-serif;
+  }
+  
+  .universityLocation {
+    font-size: 16px;
+    color: #666;
+    font-family: 'Noto Sans Thai', sans-serif;
+  }
+  
+  /* ส่วนเพิ่มเติมสำหรับ responsive design */
+  @media (max-width: 768px) {
+    .container {
+      padding: 30px;
+    }
+    
+    .universitiesList {
+      grid-template-columns: 1fr;
+    }
+    
+    .majorName {
+      font-size: 1.5rem;
+    }
+  }

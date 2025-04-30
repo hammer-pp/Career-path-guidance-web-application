@@ -1,0 +1,124 @@
+/* src/styles/CareerDetailPage.module.css */
+.background {
+    min-height: 87.3vh;
+    padding: 20px;
+    padding-bottom: 60px;
+  }
+  
+  .container {
+    background-color: #fff;
+    border-radius: 30px;
+    padding: 80px;
+    max-width: 1200px;
+    margin: 0 auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
+  
+  .backButton {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    background: #0357AF;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+    margin-top: 40px;
+    margin-right: 40px;
+  }
+  
+  .backButton:hover {
+    background: #02458e;
+  }
+  
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 40px;
+  }
+  
+  .careerImage {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+  
+  .careerInfo {
+    flex: 1;
+  }
+  
+  .careerName {
+    font-size: 2rem;
+    color: #0357AF;
+    margin: 0 0 10px 0;
+  }
+  
+  .description {
+    font-size: 1.2rem;
+    color: #666;
+    margin: 0;
+  }
+  
+  .content {
+    margin-top: 30px;
+  }
+  
+  .sectionTitle {
+    font-size: 1.5rem;
+    color: #0357AF;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f0f0f0;
+  }
+  
+  .facultyList {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    list-style: none;
+    padding: 0;
+  }
+  
+  .facultyItem {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: transform 0.2s;
+    font-size: 1.1rem;
+  }
+  
+  .facultyItem:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    background-color: #f0f0f0;
+  }
+
+  .majorList {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    list-style: none;
+    padding: 0;
+  }
+  
+  .majorItem {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: transform 0.2s;
+    font-size: 1.1rem;
+  }
+  
+  .majorItem:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    background-color: #f0f0f0;
+  }

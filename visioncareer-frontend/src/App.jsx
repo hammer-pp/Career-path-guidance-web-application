@@ -19,7 +19,9 @@ import styles from './styles/App.module.css';
 import ProfilePage from './pages/ProfilePage';
 import HistoryPage from './pages/HistoryPage';
 import UserMenu from './components/UserMenu'; // นำเข้าไฟล์ CSS Modules
-
+import CareerPage from './pages/CareerPage'; 
+import CareerDetailPage from './pages/CareerDetailPage';
+import CareerFacultyDetailPage from './pages/CareerFacultyDetailPage';
 const App = () => {
   return (
     <Router>
@@ -59,6 +61,11 @@ const AppContent = () => {
               <li>
                 <NavLink to="/university" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.activeNavLink}` : styles.navLink}>
                   มหาวิทยาลัย
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/career" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.activeNavLink}` : styles.navLink}>
+                  อาชีพ
                 </NavLink>
               </li>
               <li>
@@ -105,6 +112,11 @@ const AppContent = () => {
         <Route path="/university/:id/faculty/:facultyId" element={<FacultyDetailPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/history" element={<HistoryPage />}/>
+        <Route path="/career" element={<CareerPage />}/>
+        <Route path="/career/:id" element={<CareerDetailPage />} />
+        <Route path="/career/:id/major/:majorId" element={<CareerFacultyDetailPage />} />
+        {/* <Route path="/career/:id" element={<CareerDetailPage />} />
+        <Route path="/career/:id/faculty/:facultyId" element={<CareerFacultyDetailPage />} /> */}
       </Routes>
     </div>
   );

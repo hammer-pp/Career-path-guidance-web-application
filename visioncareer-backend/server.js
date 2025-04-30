@@ -443,12 +443,89 @@ app.get("/news/:id", async (req, res) => {
   }
 });
 
-// ตั้งค่าพอร์ต
-const PORT = process.env.PORT || 5000;
-app.listen(5000, "0.0.0.0", () => {
-  console.log("Server running on port 5000");
+app.get("/careers", async (req, res) => {
+  try {
+    const careers = await db.select("").from("careers");
+    res.json(careers);
+  } catch (error) {
+    console.error("Error fetching careers:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
+app.get("/careers/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const career = await db("careers").where("careerid", id).first();
+    if (!career) {
+      return res.status(404).json({ error: "ไม่พบข้อมูลอาชีพนี้" });
+    }
+    res.json(career);
+  } catch (error) {
+    console.error("Error fetching career by ID:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.get("/careers/:id/majors", async (req, res) => {
+  const { id } = req.params;
+  try {
+    // แก้ไข query ให้ดึงข้อมูลจากตารางที่ถูกต้อง
+    const majors = await db("major_career")
+      .join("majors", "major_career.majorid", "majors.majorid")
+      .where("major_career.careerid", id)
+      .select("majors.majorid", "majors.majorname", "majors.description");
+
+    // ตรวจสอบและแปลงข้อมูลให้เป็น array เสมอ
+    const result = Array.isArray(majors) ? majors : [];
+    
+    if (result.length === 0) {
+      return res.status(200).json([]); // ส่งกลับ array ว่างแทนการส่ง error
+    }
+
+    res.json(result);
+  } catch (error) {
+    console.error("Error fetching majors for career:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.get("/majors/:id/universities", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const universities = await db("university_major")
+      .join("universities", "university_major.universityid", "universities.universityid")
+      .where("university_major.majorid", id)
+      .select("universities.*");
+
+    if (universities.length === 0) {
+      return res.status(404).json({ error: "ไม่พบมหาวิทยาลัยที่เปิดสาขานี้" });
+    }
+
+    res.json(universities);
+  } catch (error) {
+    console.error("Error fetching universities for major:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+app.get("/majors/:id/faculty", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const faculty = await db("faculty_major")
+      .join("faculties", "faculty_major.facultyid", "faculties.facultyid")
+      .where("faculty_major.majorid", id)
+      .select("faculties.*");
+
+    if (faculty.length === 0) {
+      return res.status(404).json({ error: "ไม่พบข้อมูลคณะที่เกี่ยวข้องกับสาขานี้" });
+    }
+
+    res.json(faculty);
+  } catch (error) {
+    console.error("Error fetching faculty for major:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
 // ✅ แสดงประวัติการแนะนำอาชีพทั้งหมดของผู้ใช้
 app.get("/user/:user_id/recommendation-history", async (req, res) => {
@@ -483,4 +560,10 @@ app.get("/user/:user_id/recommendation-history", async (req, res) => {
     console.error("❌ Error fetching recommendation history:", error);
     res.status(500).json({ error: "Failed to fetch recommendation history" });
   }
+});
+
+// ตั้งค่าพอร์ต
+const PORT = process.env.PORT || 5000;
+app.listen(5000, "0.0.0.0", () => {
+  console.log("Server running on port 5000");
 });
