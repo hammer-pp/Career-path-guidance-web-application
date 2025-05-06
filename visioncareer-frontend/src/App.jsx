@@ -22,6 +22,11 @@ import UserMenu from './components/UserMenu'; // นำเข้าไฟล์ 
 import CareerPage from './pages/CareerPage'; 
 import CareerDetailPage from './pages/CareerDetailPage';
 import CareerFacultyDetailPage from './pages/CareerFacultyDetailPage';
+import { Chart } from 'chart.js';
+import { CategoryScale, LinearScale, BarElement } from 'chart.js';
+
+Chart.register(CategoryScale, LinearScale, BarElement);
+
 const App = () => {
   return (
     <Router>

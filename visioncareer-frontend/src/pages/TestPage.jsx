@@ -5,6 +5,7 @@ import AuthContext from "./AuthContext";
 import React, { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { predictAnswers } from "../api";
+import HorizontalBarChart from './HorizontalBarChart';
 
 const FLASK_URL = import.meta.env.VITE_FLASK_URL || "/model";
 const API_URL = import.meta.env.VITE_API_URL || "/api";
@@ -33,6 +34,12 @@ const TestPage = () => {
     setStep(2);
     setCurrentQuestionIndex(0);
   };
+  // ในส่วนของ state ให้เพิ่ม
+  const [personalityTraits, setPersonalityTraits] = useState(null);
+  const [interestTraits, setInterestTraits] = useState(null);
+  // ในฟังก์ชัน handleSubmit หลังจากได้ผลลัพธ์จาก API
+ 
+  
 
   const negativeScoreQuestions = [1, 3, 6, 8, 10, 13, 15, 21, 22, 23, 25];
 
@@ -72,36 +79,47 @@ const TestPage = () => {
 
     try {
       // 1. ส่งคำตอบไปคำนวณที่ predict.py (Flask)
-      const predictRes = await fetch(`${FLASK_URL}/predict`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ answers: combinedArray, user_id: user?.userid || null }),
-      });
-      const predictData = await predictRes.json();
-  
-      const { holland_group, big5_group } = predictData;
-
-      const mapRes = await fetch(`${API_URL}/get-mapped-careers`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+        const predictRes = await fetch(`${FLASK_URL}/predict`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ answers: combinedArray, user_id: user?.userid || null }),
+        });
+        const predictData = await predictRes.json();
+      
+        const { holland_group, big5_group, holland_scores, big5_scores } = predictData;
+      
+        const mapRes = await fetch(`${API_URL}/get-mapped-careers`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            holland_group,
+            big5_group,
+          }),
+        });
+        
+        const mapData = await mapRes.json();
+        if (!mapRes.ok || mapData.error) throw new Error(mapData.error || "ดึงข้อมูลอาชีพล้มเหลว");
+      
+        // ตั้งค่าผลลัพธ์
+        setPersonalityTraits(big5_scores);
+        setInterestTraits(holland_scores);
+        setResult({
           holland_group,
           big5_group,
-        }),
-      });
+          career_ids: mapData.career_ids,
+          holland_scores,
+          big5_scores
+        });
       
-      const mapData = await mapRes.json();
-      if (!mapRes.ok || mapData.error) throw new Error(mapData.error || "ดึงข้อมูลอาชีพล้มเหลว");
-
-      // ถ้ามี career_ids ค่อย fetch รายละเอียด
-      let careerObjects = [];
-      if (Array.isArray(mapData.career_ids) && mapData.career_ids.length > 0) {
-        const careersRes = await fetch(`${API_URL}/careers/all?ids=${mapData.career_ids.join(",")}`);
-        careerObjects = await careersRes.json();
-        setCareers(careerObjects);
-      } else {
-        setCareers([]);
-      }
+        // ถ้ามี career_ids ค่อย fetch รายละเอียด
+        let careerObjects = [];
+        if (Array.isArray(mapData.career_ids) && mapData.career_ids.length > 0) {
+          const careersRes = await fetch(`${API_URL}/careers/all?ids=${mapData.career_ids.join(",")}`);
+          careerObjects = await careersRes.json();
+          setCareers(careerObjects);
+        } else {
+          setCareers([]);
+        }
 
       // 3. save test และ recommend careers เฉพาะถ้าเป็น user
       if (user && user.userid) {
@@ -346,6 +364,18 @@ const TestPage = () => {
           )}
 {step === 3 && (
   <div className={styles.resultContainer}>
+     <h2 className={styles.resultTitle}>ผลลัพธ์แบบทดสอบของคุณ</h2>
+    
+    <div className={styles.chartsGrid}>
+      <HorizontalBarChart 
+        title="แบบทดสอบบุคลิกภาพ (Big Five)" 
+        data={personalityTraits || result?.big5_scores} 
+      />
+      <HorizontalBarChart 
+        title="แบบทดสอบความสนใจ (Holland)" 
+        data={interestTraits || result?.holland_scores} 
+      />
+    </div>
     <h2 className={styles.resultTitle}>อาชีพที่เหมาะกับคุณ</h2>
     <div className={styles.careersGrid}>
       {careers.map(c => (

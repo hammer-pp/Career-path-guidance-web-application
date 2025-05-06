@@ -164,12 +164,14 @@ def predict():
         big5_pred = int(big5_pred[0])
 
         print(f"📌 กลุ่ม Holland: {holland_pred}, กลุ่ม Big5: {big5_pred}")
-
+        # ในส่วนของ route /predict
         predictions = {
             "holland_group": holland_pred,
             "big5_group": big5_pred,
-            "holland_scores": holland_score.T.to_dict(orient="records"),
-            "big5_scores": big5_score.T.to_dict(orient="records")
+            # "holland_scores": holland_score.to_dict(orient="records")[0],  
+            # "big5_scores": big5_score.to_dict(orient="records")[0]        
+            "holland_scores": holland_score["Percentage"].to_dict(),
+            "big5_scores": big5_score["Percentage"].to_dict()
         }
         return jsonify(predictions)
     except Exception as e:
