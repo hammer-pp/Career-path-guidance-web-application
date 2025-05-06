@@ -114,12 +114,17 @@
   background: linear-gradient(135deg, #3faff0, #0180CC);
 }
 
-/* Pagination Styles */
+/* ส่วนของ Pagination Styles ที่แก้ไข */
 .pagination {
   display: flex;
   justify-content: center;
+  align-items: center;
   margin-top: 40px;
   gap: 10px;
+  flex-wrap: nowrap; 
+  /* max-width: 100%; จำกัดความกว้างสูงสุด */
+  overflow-x: auto; /* ให้สามารถเลื่อนแนวนอนได้เมื่อจำเป็น */
+  padding-bottom: 10px; /* เพิ่มช่องว่างด้านล่าง */
 }
 
 .pageButton {
@@ -129,23 +134,73 @@
   border-radius: 5px;
   cursor: pointer;
   transition: all 0.3s;
+  margin: 2px; /* เพิ่ม margin เพื่อป้องกันการติดกัน */
+  flex-shrink: 0; /* ป้องกันการหดตัวของปุ่ม */
 }
 
-.pageButton:hover:not(:disabled) {
-  background: #f0f0f0;
+
+/* เพิ่มสไตล์สำหรับปุ่ม navigation */
+.paginationNav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.pageButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+/* สไตล์สำหรับกลุ่มปุ่มเลขหน้า */
+.pagination-numbers {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 5px;
+  max-width: 80%; /* จำกัดความกว้างของกลุ่มเลขหน้า */
 }
 
+/* สไตล์สำหรับหน้าปัจจุบัน */
 .pageButton.active {
   background: #3498db;
   color: white;
   border-color: #3498db;
 }
 
+/* สไตล์เมื่อ hover */
+.pageButton:hover:not(:disabled) {
+  background: #f0f0f0;
+}
+
+/* สไตล์เมื่อ disabled */
+.pageButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+/* เพิ่มสไตล์สำหรับจุดไข่ปลา */
+.pageDots {
+  display: inline-flex; /* ทำให้แสดงในบรรทัดเดียวกัน */
+  padding: 0 8px ;
+  
+}
+
+/* สำหรับหน้าจอขนาดเล็กมาก */
+@media (max-width: 480px) {
+  .pagination-numbers {
+    max-width: 90%;
+  }
+  
+  .pageButton {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+}
+/* สำหรับหน้าจอขนาดเล็ก */
+@media (max-width: 768px) {
+  .pagination {
+    gap: 5px;
+  }
+  
+  .pageButton {
+    padding: 6px 10px;
+    font-size: 14px;
+  }
+}
 /* Responsive Design */
 @media (max-width: 768px) {
   .container {

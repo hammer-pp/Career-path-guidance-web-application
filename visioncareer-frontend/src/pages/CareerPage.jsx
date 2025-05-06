@@ -100,25 +100,68 @@ const CareerPage = () => {
           ))}
         </div>
 
+        
         {totalPages > 1 && (
           <div className={styles.pagination}>
-            <button
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className={styles.pageButton}
-            >
-              &lt;
-            </button>
-            
-            {Array.from({ length: totalPages }, (_, i) => (
+            <div className={styles.paginationNav}>
+        {/* ปุ่มย้อนกลับ 10 หน้า หรือไปหน้าแรกสุด */}
+        <button
+        onClick={() =>
+          setCurrentPage(prev => (prev <= 10 ? 1 : prev - 10))
+        }
+        disabled={currentPage === 1}
+        className={styles.pageButton}
+      >
+        {'<<'}
+      </button>
               <button
-                key={i}
-                onClick={() => setCurrentPage(i + 1)}
-                className={`${styles.pageButton} ${currentPage === i + 1 ? styles.active : ''}`}
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className={styles.pageButton}
               >
-                {i + 1}
+                &lt;
               </button>
-            ))}
+              
+              <div className={styles.paginationNumbers}>
+                {/* แสดงเฉพาะบางหน้าใกล้เคียงกับหน้าปัจจุบัน */}
+                {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                  let pageNum;
+                  if (totalPages <= 7) {
+                    pageNum = i + 1;
+                  } else if (currentPage <= 4) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= totalPages - 3) {
+                    pageNum = totalPages - 6 + i;
+                  } else {
+                    pageNum = currentPage - 3 + i;
+                  }
+                  
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => setCurrentPage(pageNum)}
+                      className={`${styles.pageButton} ${currentPage === pageNum ? styles.active : ''}`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+        
+              {/* แสดง ... เมื่อมีหน้าจำนวนมาก */}
+              {totalPages > 7 && currentPage < totalPages - 3 && (
+                <span className={styles.pageDots}>...</span>
+              )}
+              
+              {/* แสดงหน้าสุดท้ายเสมอ */}
+              {totalPages > 7 && currentPage < totalPages - 3 && (
+                <button
+                  onClick={() => setCurrentPage(totalPages)}
+                  className={`${styles.pageButton} ${currentPage === totalPages ? styles.active : ''}`}
+                >
+                  {totalPages}
+                </button>
+              )}
+            </div>
             
             <button
               onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
@@ -127,8 +170,21 @@ const CareerPage = () => {
             >
               &gt;
             </button>
+                  {/* ปุ่มไปข้างหน้า 10 หน้า หรือหน้าสุดท้าย */}
+                  <button
+                    onClick={() =>
+                      setCurrentPage(prev =>
+                        prev >= totalPages - 9 ? totalPages : prev + 10
+                      )
+                    }
+                    disabled={currentPage === totalPages}
+                    className={styles.pageButton}
+                  >
+                    {'>>'}
+                  </button>
           </div>
-        )}
+        </div>
+      )}
       </div>
     </div>
   );
